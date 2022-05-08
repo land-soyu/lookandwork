@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "586912946138",
+    "project_id": "thepick-owner",
+    "storage_bucket": "thepick-owner.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:586912946138:android:c74d3c9effe8df593552e3",
+        "android_client_info": {
+          "package_name": "net.steeloz.thepick.owner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "586912946138-th758dqmepnrifk41crfkrgike9sgcel.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "net.steeloz.thepick.owner",
+            "certificate_hash": "a50c03104e34968b26a175eaf8403de9c1d744c4"
+          }
+        },
+        {
+          "client_id": "586912946138-v30dhgnh3blr7p24dg1pt81onb5014tf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXCAQSCtBAIRBYEvtMl4dMQUGx3GvPVTo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "586912946138-v30dhgnh3blr7p24dg1pt81onb5014tf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

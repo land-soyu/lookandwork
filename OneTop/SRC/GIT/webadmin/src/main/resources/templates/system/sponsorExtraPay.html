@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+	<title th:text="#{sys2.title}"></title>
+	<th:block layout:fragment="css">
+
+	</th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+	<div th:replace="include/menu :: system"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+
+	<th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+	<div class="contSection" th:if="${securityYN}=='Y'">
+		<h2 class="tit_h2" th:text="#{sponsorextrapay.h2}"></h2>
+		<p class="topButton" th:if="${mode} == 'modify'">
+			<a href="javascript:void(0);" class="btnType import" th:text="#{import.btn}"></a>
+		</p>
+		<p class="topButton" th:unless="${mode} == 'modify'">
+			<a href="javascript:void(0);" class="btnType edit" th:if="${member_proc.role == 0}" th:text="#{modify.btn}"></a>
+		</p>
+		<div class="tableStyle aCenter inputArea mb20">
+			<table>
+				<colgroup>
+					<col style="width: 13%;" />
+					<col style="width: 29%;" />
+					<col style="width: 29%;" />
+					<col style="width: 29%;" />
+				</colgroup>
+				<thead>
+				<tr>
+					<th>구분</th>
+					<th>커뮤니티</th>
+					<th>후원 수당 지급 기준</th>
+					<th>지급률(%)</th>
+				</tr>
+				</thead>
+				<tbody th:with="listSize=${#lists.size(sponsorExtraPay)}">
+				<th:block th:if="${mode}=='modify'">
+					<tr th:each="sponsor, iter : ${sponsorExtraPay}">
+						<td>
+							<input type="hidden" th:id="sponsor_+${sponsor.idx}" th:value="${sponsor.idx}">
+							<p class="systemBox2" th:text="후원수당+${sponsor.idx}"></p>
+						</td>
+						<td>
+							<p class="systemBox2" th:if="${sponsor.idx} == 5" th:text="${sponsor.idx}+'대~10대'"></p>
+							<p class="systemBox2" th:if="${sponsor.idx} != 5" th:text="${sponsor.idx}+대"></p>
+						</td>
+						<td>
+							<p class="systemBox2" th:if="${sponsor.idx} == 5" th:text="${sponsor.idx}+'대~10대 기본 수당의(합)'+${#numbers.formatDecimal(sponsor.paymentrate, 1, 'COMMA', 2, 'POINT')}+'%'"></p>
+							<p class="systemBox2" th:if="${sponsor.idx} != 5" th:text="${sponsor.idx}+'대 기본 수당의(합)'+${#numbers.formatDecimal(sponsor.paymentrate, 1, 'COMMA', 2, 'POINT')}+'%'"></p>
+						</td>
+						<td>
+							<p class="typeText">
+								<input type="text" th:id="sponsor_paymentrate_+${sponsor.idx}" name="paymentrate" th:value="${#numbers.formatDecimal(sponsor.paymentrate, 1, 'COMMA', 2, 'POINT')}" onchange="numberWithCommas(this.value, this, null, 0.00, 100, 2)" onkeypress="return isNumberKey(event)" />
+							</p>
+						</td>
+					</tr>
+				</th:block>
+				<th:block th:unless="${mode}=='modify' and ${listSize}>0" th:each="sponsor:${sponsorExtraPay}">
+					<tr>
+						<td>
+							<p class="systemBox2" th:id="sponsor_+${sponsor.idx}" th:text="후원수당+${sponsor.idx}"></p>
+						</td>
+						<td>
+							<p class="systemBox2" th:if="${sponsor.idx} == 5" th:text="${sponsor.idx}+'대~10대'"></p>
+							<p class="systemBox2" th:if="${sponsor.idx} != 5" th:text="${sponsor.idx}+대"></p>
+						</td>
+						<td>
+							<p class="systemBox2" th:if="${sponsor.idx} == 5" th:text="${sponsor.idx}+'대~10대 기본 수당의(합)'+${#numbers.formatDecimal(sponsor.paymentrate, 1, 'COMMA', 2, 'POINT')}+'%'"></p>
+							<p class="systemBox2" th:if="${sponsor.idx} != 5" th:text="${sponsor.idx}+'대 기본 수당의(합)'+${#numbers.formatDecimal(sponsor.paymentrate, 1, 'COMMA', 2, 'POINT')}+'%'"></p>
+						</td>
+						<td>
+							<p class="systemBox2"><th:block th:text="${#numbers.formatDecimal(sponsor.paymentrate, 1, 'COMMA', 2, 'POINT')}"></th:block>%</p>
+						</td>
+					</tr>
+				</th:block>
+				</tbody>
+			</table>
+		</div>
+		<div class="buttonRight" th:if="${mode} == 'modify'">
+			<a href="javascript:void(0);" class="btnType cancel" th:text="#{cancel.btn}"></a>
+		</div>
+	</div>	<!-- //contSection -->
+</div>
+
+<th:block layout:fragment="script">
+	<script type="text/javascript" src="/js/admin_common.js"></script>
+	<script type="text/javascript" src="/js/include/menu_system.js"></script>
+	<script type="text/javascript" src="/js/system/sys2.js"></script>
+	<script type="text/javascript" th:inline="javascript">
+		/*<![CDATA[*/
+		var STR_Q_IMPORT = [[#{import.message}]];
+		var STR_Q_MODIFY = [[#{basicextrapay.q.modify}]];
+		var STR_NOT_ENOUGH_PARAMS =[[#{import.notenoughparams}]];
+		var STR_REQUEST_FAIL=[[#{import.requestfail}]];
+		var STR_REQUEST_SUCCESS=[[#{import.reuqestsuccess}]];
+		var COMMON_TEXT_CONFIRM = [[#{common.text.confirm}]];
+		var COMMON_TEXT_NOTHINGSELECTED = [[#{common.text.nothingselected}]];
+		/*]]>*/
+	</script>
+</th:block>
+</body>
+</html>

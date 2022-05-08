@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout_other">
+<head>
+<title th:text="#{mem1.mod.title}"></title>
+<th:block layout:fragment="css">
+	<link rel="stylesheet" href="/css/datepicker.min.css"/>
+	<style>
+		.popupLayer .popButton a.popBlackConsumerCancel { background-color: #fff; color: #657d95; }
+		.popupLayer .popButton a.popBlackConsumerCancel:hover{background-color: #4088d1; color: #fff; }
+	</style>
+</th:block>
+</head>
+<body class="newWin">
+<div layout:fragment="content">
+	<th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+	<div class="contSection" th:if="${securityYN}=='Y'">
+		<form action="javascript:;" name="search_mem1_mod_form" id="search_mem1_mod_form" method="POST">
+			<input type="hidden" name="mb_id" id="mb_id" th:value="${memberInfo.mb_id}">
+		</form>
+		<input type="hidden" name="modulus" id="modulus" th:value="${modulus}">
+		<input type="hidden" name="exponent" id="exponent" th:value="${exponent}">
+
+
+		<h2 class="tit_h2" th:text="#{mem1.mod.title}"></h2>
+		
+		<!-- 기본 정보 -->
+		<h3 class="tit_h3" th:text="#{mem1.mod.sub.info}"></h3>
+		<div class="tableStyle2 mb50">
+			<table>
+				<colgroup>
+                    <col style="width: 20%;" />
+                    <col style="width: 80%;" />
+				</colgroup>
+				<tbody>
+					<tr>
+						<th th:text="#{mem1.table.thead.th.mb_no}"></th>
+						<td th:text="${memberInfo.mb_no}"></td>
+					</tr>
+					<tr>
+						<th th:text="#{mem1.table.thead.th.mb_id}"></th>
+						<td>
+							<div class="tableButtonArea">							
+								<span th:text="${memberInfo.mb_id} + '    ('+${memberInfo.mb_email}+')'"></span>
+								<div class="buttonArea">
+									<a th:href="@{'javascript: send_password_reset_request(\'' + ${memberInfo.mb_id} + '\');'}" class="tableButton no" th:text="#{mem1.mod.sub.reset_password_desc}"></a>
+								</div>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{mem1.table.thead.th.mb_name}"></th>
+						<td th:text="${memberInfo.mb_name}"></td>
+					</tr>
+					<tr>
+						<th th:text="#{mem1.table.thead.th.country}"></th>
+						<td th:text="${memberInfo.country_code}"></td>
+					</tr>
+					<tr>
+						<th th:text="#{mem1.table.thead.th.mb_phone}"></th>
+						<td th:text="${memberInfo.mb_phone}"></td>
+					</tr>
+					<tr>
+						<th th:text="#{mem1.table.thead.th.mb_email}"></th>
+						<td>
+							<div class="tableButtonArea">
+								<span th:text="${memberInfo.mb_email}"></span> 
+								<div class="buttonArea">
+									<a th:href="@{'javascript: openEmailEditPop(\'' + ${memberInfo.mb_no} + '\',\''+${memberInfo.mb_email}+'\');'}" class="tableButton no" th:text="#{mem1.mod.sub.email_edit}"></a>
+								</div>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{mem1.table.thead.th.mb_reg_dt}"></th>
+						<td th:text="${memberInfo.mb_reg_dt}"></td>
+					</tr>
+					<tr>
+						<th th:text="#{mem1.table.thead.th.mb_referer}"></th>
+						<td th:text="${memberInfo.mb_referer}"></td>
+					</tr>
+					<tr>
+						<th th:text="#{mem1.table.thead.th.mb_sponsor}"></th>
+						<td th:text="${memberInfo.mb_sponsor}"></td>
+					</tr>
+					<tr>
+						<th th:text="#{mem1.mod.sub.status}"></th>
+						<td>
+							<div class="tableButtonArea">
+								<span th:if="${memberInfo.mb_status == 'OK'}" th:text="#{status.OK}"></span>
+								<span th:if="${memberInfo.mb_status == 'DEL'}" th:text="#{status.DEL}"></span>
+								<span th:if="${memberInfo.mb_status == 'REST'}" th:text="#{status.REST}"></span>
+								<span th:if="${memberInfo.mb_status == 'BLK'}" th:text="#{status.BLK}"></span>
+								<a th:if="${memberInfo.mb_status != 'BLK'}" th:href="@{'javascript: openBlackConsumerPop(\'' + ${memberInfo.mb_id} + '\');'}" class="tableButton" th:text="#{status.BLK} + ' ' + #{registration}"></a>
+								<a th:if="${memberInfo.mb_status == 'BLK'}" th:href="@{'javascript: openReleaseBlackConsumerPop(\'' + ${memberInfo.mb_id} + '\');'}" class="tableButton" th:text="#{release.btn}"></a>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{mem1.table.thead.th.last_visit_dt}"></th>
+						<td>
+							<div class="tableButtonArea">
+								<span th:text="${memberInfo.mb_last_login_dt}"></span> 
+								<div class="buttonArea">
+									<a href="#" class="tableButton no" th:text="#{mem1.mod.sub.delete}"></a>
+								</div>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{mem1.table.thead.th.donation}"></th>
+						<td th:text="${memberInfo.mb_donate}"></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th th:text="#{mem1.table.thead.th.invite_link}"></th>
+						<td th:text="${'https://dev.onetopinvest.com/joinmember/'+memberInfo.mb_id}"></td>
+					</tr>
+					<tr>
+						<th th:text="#{mem1.table.thead.th.mb_sms_auth_dt}"></th>
+						<td th:text="${memberInfo.mb_sms_auth_dt}"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<!-- 지갑주소 -->
+		<h3 class="tit_h3" th:text="#{mem1.wallet.address}"></h3>
+		<div class="tableStyle aCenter font13 mb50 fitTable">
+			<table>
+				<colgroup>
+					<col style="width: 25%;">
+					<col style="width: 50%;">
+					<col style="width: 25%;">
+				</colgroup>
+				<thead>
+					<tr>
+						<th th:text="#{coin}"></th>
+						<th th:text="#{mem1.wallet.address}"></th>
+						<th th:text="#{create.date}"></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:if="${#lists.size(memberWalletAddressList)} > 0" th:each="memberWalletAddress : ${memberWalletAddressList}">
+						<td th:text="${memberWalletAddress.w_coin_type}"></td>
+						<td th:text="${memberWalletAddress.w_addr}"></td>
+						<td th:text="${#dates.format(memberWalletAddress.created_at, 'yyyy-MM-dd HH:mm:ss')}"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<!-- 자산정보 -->
+		<h3 class="tit_h3" th:text="#{asset.infor}"></h3>
+		<div class="tableStyle2 font13 mb50">
+			<table>
+				<colgroup>
+					<col style="width: 20%;">
+					<col style="width: 80%;">
+				</colgroup>
+				<tbody>
+					<tr>
+						<th th:text="#{mem1.table.thead.th.total_purchase}"></th>
+						<td th:text="${memberInfo.amount_sum_buy}"></td>
+					</tr>
+					<tr>
+						<th th:text="#{mem1.table.thead.th.total_withdraw_bonus}"></th>
+						<td th:text="${memberInfo.withdraw_bonus}"></td>
+					</tr>
+					<tr>
+						<th th:text="#{mem1.table.thead.th.has_bonus_point}"></th>
+						<td th:text="${memberInfo.apply_bonus}"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<!-- 구매 내역 -->
+		<h3 class="tit_h3" th:text="#{mem1.mod.sale.h3}"></h3>
+		<div class="tableStyle aCenter mb10 font13 fitTable">
+			<table>
+				<colgroup>
+					<col style="width: 50%;">
+					<col style="width: 50%;">
+				</colgroup>
+				<thead>
+					<tr>
+						<th th:text="#{mem1.mod.sale.thead.count}"></th>
+						<th th:text="#{mem1.mod.sale.thead.amount}"></th>
+					</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td th:text="${memberInfo.count_buy}"></td>
+					<td th:text="${memberInfo.amount_sum_buy}"></td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+        <div class="buttonRight mb50">
+            <a href="javascript: goBank1();" class="btnType" th:text="#{mem1.mod.sale.more}"></a>
+        </div>
+
+		<!-- 보너수(수당)합계 -->
+		<h3 class="tit_h3" th:text="#{mem1.mod.bonus.h3}"></h3>
+		<div class="tableStyle aCenter mb10 font13 fitTable">
+			<table>
+				<colgroup>
+					<col style="width: 16%;">
+					<col style="width: 16%;">
+					<col style="width: 16%;">
+					<col style="width: 16%;">
+					<col style="width: 16%;">
+					<col style="width: 17%;">
+				</colgroup>
+				<thead>
+					<tr>
+						<th th:text="#{mem1.mod.bonus.thead.total}"></th>
+						<th th:text="#{mem1.mod.bonus.thead.daily}"></th>
+						<th th:text="#{mem1.mod.bonus.thead.recommend}"></th>
+						<th th:text="#{mem1.mod.bonus.thead.matching}"></th>
+						<th th:text="#{mem1.mod.bonus.thead.team}"></th>
+						<th th:text="#{mem1.mod.bonus.thead.donation}"></th>
+					</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td th:text="${memberInfo.apply_bonus}"></td>
+					<td th:text="${memberInfo.daily_bonus}"></td>
+					<td th:text="${memberInfo.referer_bonus}"></td>
+					<td th:text="${memberInfo.matching_bonus}"></td>
+					<td th:text="${memberInfo.team_bonus}"></td>
+					<td>0</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+        <div class="buttonRight mb50">
+            <a href="javascript: goMem5();" class="btnType" th:text="#{mem1.mod.bonus.more}"></a>
+        </div>
+
+		<!-- 출금 내역 -->
+		<h3 class="tit_h3" th:text="#{mem1.mod.sale.withdraw}"></h3>
+		<div class="tableStyle aCenter mb10 font13 fitTable">
+			<table>
+				<colgroup>
+					<col style="width: 50%;">
+					<col style="width: 50%;">
+				</colgroup>
+				<thead>
+					<tr>
+						<th th:text="#{mem1.mod.withdrawal.thead.count}"></th>
+						<th th:text="#{mem1.mod.withdrawal.thead.bonus}"></th>
+					</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td th:text="${memberInfo.count_withdraw}"></td>
+					<td th:text="${memberInfo.amount_sum_withdraw}"></td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+        <div class="buttonRight mb50">
+            <a href="javascript: goBank41();" class="btnType" th:text="#{mem1.mod.withdrawal.more}"></a>
+        </div>
+
+		<!-- 후원 조직도 -->
+		<h3 class="tit_h3" th:text="#{mem1.mod.sponsor.h3}"></h3>
+		<div class="tableStyle aCenter font13 mb50 fitTable">
+			<table>
+				<colgroup>
+					<col style="width: 34%;">
+					<col style="width: 33%;">
+					<col style="width: 33%;">
+				</colgroup>
+				<thead>
+					<tr>
+						<th th:text="#{mem1.mod.sponsor.thead.flag}"></th>
+						<th th:text="#{mem1.mod.sponsor.thead.left}"></th>
+						<th th:text="#{mem1.mod.sponsor.thead.right}"></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th th:text="#{mem1.mod.sponsor.thead.ucnt}"></th>
+						<td th:text="${mainSponsorL.UCNT}"></td>
+						<td th:text="${mainSponsorR.UCNT}"></td>
+					</tr>
+					<tr>
+						<th th:text="#{mem1.mod.sponsor.thead.today}"></th>
+						<td th:text="${mainSponsorL.TODAY_AMT}"></td>
+						<td th:text="${mainSponsorR.TODAY_AMT}"></td>
+					</tr>
+					<tr>
+						<th th:text="#{mem1.mod.sponsor.thead.total}"></th>
+						<td th:text="${mainSponsorL.TOTAL_AMT}"></td>
+						<td th:text="${mainSponsorR.TOTAL_AMT}"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<!-- 추천 조직도 -->
+		<h3 class="tit_h3" th:text="#{mem1.mod.referer.h3}"></h3>
+		<div class="tableStyle2 aCenter mb50">
+			<table>
+				<colgroup>
+					<col style="width: 20%;" />
+					<col style="width: 80%;" />
+				</colgroup>
+				<tbody>
+				<tr>
+					<th th:text="#{mem1.mod.referer.count}"></th>
+					<td th:text="${mainReferer.CNT_REFERER}"></td>
+				</tr>
+				<tr>
+					<th th:text="#{mem1.mod.referer.all_count}"></th>
+					<td th:text="${mainReferer.UCNT}"></td>
+				</tr>
+				<tr>
+					<th th:text="#{mem1.mod.referer.all_sale}"></th>
+					<td th:text="${mainReferer.TOTAL_AMT}"></td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+		
+		<!-- 계정 잠금 내역 -->
+		<h3 class="tit_h3"><span th:text="#{mem1.mod.blk.h3}"></span></h3>
+		<div class="tableStyle aCenter head2 font13 mb20">
+			<table>
+				<colgroup>
+					<col style="width: 20%;" />
+					<col style="width: 20%;" />
+					<col style="width: 20%;" />
+					<col style="width: 20%;" />
+					<col style="width: 20%;" />
+				</colgroup>
+				<thead>
+					<tr>
+						<th th:text="#{sys7.start.dt}"></th>
+						<th th:text="#{sys7.end.dt}"></th>
+						<th th:text="#{mem4.content}"></th>
+						<th th:text="#{mem1.mod.sub.stop.memo}"></th>
+						<th th:text="#{mem1.mod.sub.release.memo}"></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:if="${#lists.size(blackConsumerResponse.blackConsumerList)} > 0" th:each="blackConsumer, index : ${blackConsumerResponse.blackConsumerList}" >
+						<th:block th:if="${index.index} < 3">
+							<td th:text="${#dates.format(blackConsumer.reg_dt, 'yyyy-MM-dd')}"></td>
+							<td th:text="${#dates.format(blackConsumer.end_dt, 'yyyy-MM-dd')}"></td>
+							<td class="pushTalble02">
+								<p>
+									<span th:if="${blackConsumer.type} == 0" th:text="#{mem1.mod.blackconsumer.type.0}"></span>
+									<span th:if="${blackConsumer.type} == 1" th:text="#{mem1.mod.blackconsumer.type.1}"></span>
+									<span th:if="${blackConsumer.type} == 2" th:text="#{mem1.mod.blackconsumer.type.2}"></span>
+								</p>
+								<p class="typeToolTip" th:if="${blackConsumer.type_memo} and ${blackConsumer.type_memo != ''}">
+									<span>(</span>
+									<span th:text="${blackConsumer.type_memo}" class="txid"></span>
+									<span class="toolTipBox">
+										<span th:text="${blackConsumer.type_memo}"></span>
+									</span>
+									<span>)</span>
+								</p>
+							</td>
+							<td th:text="${blackConsumer.mb_blk_type}"></td>
+							<td class="pushTalble02">
+								<p class="typeToolTip" th:if="${blackConsumer.memo} and ${blackConsumer.memo != ''}">
+									<span th:text="${blackConsumer.memo}" class="txid"></span>
+									<span class="toolTipBox" style="left: -175px;">
+										<span th:text="${blackConsumer.memo}"></span>
+									</span>
+								</p>
+							</td>
+						</th:block>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<!-- 보안인증 -->
+		<h3 class="tit_h3" th:text="#{security.authentication}"></h3>
+		<div class="tableStyle2 aCenter mb50">
+			<table>
+				<colgroup>
+					<col style="width: 20%;" />
+					<col style="width: 80%;" />
+				</colgroup>
+				<tbody>
+				<tr>
+					<th th:text="#{mem1.table.thead.th.cert.email}"></th>
+					<td th:text="${memberInfo.mb_email_confirm_dt} ? #{status.complete} + ' (' + ${#dates.format(memberInfo.mb_email_confirm_dt, 'yyyy-MM-dd HH:mm:ss')} + ')' : #{mem1.mod.cert.not_confirm}"></td>
+				</tr>
+				<tr>
+					<th th:text="#{mem1.table.thead.th.cert.otp}"></th>
+					<td>
+						<div class="tableButtonArea">
+                            <span th:if="${memberInfo.otp_reg_dt} != null">
+                                <span th:text="#{status.complete} + ' (' + ${#dates.format(memberInfo.otp_reg_dt, 'yyyy-MM-dd HH:mm:ss')} + ')'"></span>
+                                <a href="javascript:void(0);" class="tableButton" id="otpcancle" th:text="#{mem1.mod.cert.clear}" th:mbId="${memberInfo.mb_id}" th:mbNo="${memberInfo.mb_no}"></a>
+                            </span>
+							<span th:unless="${memberInfo.otp_reg_dt} != null">
+                                <span th:text="#{mem1.mod.cert.not_confirm}"></span>
+                            </span>
+						</div>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<!-- 기부 -->
+		<!-- <h3 class="tit_h3" th:text="#{mem1.mod.donation.h3}"></h3>
+		<div class="tableStyle2 aCenter mb50">
+			<table>
+				<colgroup>
+					<col style="width: 20%;" />
+					<col style="width: 80%;" />
+				</colgroup>
+				<tbody>
+				<tr>
+					<th th:text="#{mem1.mod.donation.date}"></th>
+					<td>[@todo 값 지정 필요]</td>
+				</tr>
+				<tr>
+					<th th:text="#{mem1.mod.donation.point}"></th>
+					<td>[@todo 값 지정 필요]</td>
+				</tr>
+				</tbody>
+			</table>
+		</div> -->
+        	
+        <div class="buttonRight">
+            <a href="#" class="btnType" th:text="#{mem1.save.btn}"></a>
+            <a href="#" class="btnType" th:text="#{mem1.list.btn}"></a>
+        </div>
+
+		<div class="pageFoot mb50">
+			<ul class="footList">
+				<li th:text="#{footer.message.1}"></li>
+			</ul>
+		</div>
+
+
+	</div>
+	<!-- //contSection -->
+</div>
+<!-- //contents -->
+
+
+<th:block layout:fragment="side">
+	<!-- blackconsumer popup -->
+	<div class="popupArea" id="blackConsumerPopup" style="display: none;">
+		<div class="dim"></div>
+		<div class="popupLayer">
+			<div class="popup">
+				<div class="box 430">
+					<p class="popTit" th:text="#{status.BLK} + ' ' + #{registration}"></p>
+					<div class="popCont">
+						<form name="blackconsumerForm" id="blackconsumerForm" action="javascript:;">
+							<!-- finalConfirm -->
+							<dl class="fc-elem">
+								<dt th:text="#{mem1.table.thead.th.mb_id}"></dt>
+								<dd>
+								<span class="typeText">
+									<input type="text" name="mb_id" id="blk_add_mb_id" readonly />
+								</span>
+								</dd>
+							</dl>
+							<dl class="fc-elem">
+								<dt th:text="#{sys7.end.dt}"></dt>
+								<dd>
+									<p class="dateChoicePopup" id="end_dt_select">
+										<span>
+											<img src="/images/calendar_icon.png" alt="날짜선택" />
+											<input id="blk_add_end_dt" name="end_dt" type="text" value="" class="datepicker-here" th:data-language="${#locale}" placeholder="YYYY.MM.DD" />
+										</span>
+									</p>
+								</dd>
+							</dl>
+							<dl class="fc-elem">
+								<dt th:text="#{mem4.content}"></dt>
+								<dd>
+									<span class="typeSelect">
+										<select name="type" id="type">
+											<option value="0" selected th:text="#{mem1.mod.blackconsumer.type.0}"></option>
+											<option value="1" th:text="#{mem1.mod.blackconsumer.type.1}"></option>
+											<option value="2" th:text="#{mem1.mod.blackconsumer.type.2}"></option>
+										</select>
+									</span>
+								</dd>
+							</dl>
+							<dl class="fc-elem">
+								<dt th:text="#{mem1.mod.sub.detail.memo}"></dt>
+								<dd class="pushTalble">
+									<span class="typeText">
+										<input type="text" name="type_memo" id="type_memo" onchange="checkBytes(this, this.value, 30, document.getElementById('bytesTypeMemo'));"
+											   onkeyup="return checkBytes(this, this.value, 30, document.getElementById('bytesTypeMemo'));"/>
+										<span class="byte">
+											<span id="bytesTypeMemo">0</span> byte
+										</span>
+									</span>
+								</dd>
+							</dl>
+							<dl class="fc-elem">
+								<dt th:text="#{mem1.mod.sub.stop.memo}"></dt>
+								<dd>
+									<input type="checkbox" id="mb_blk_type_login" name="mb_blk_type" value="LOGIN" /><label for="mb_blk_type_login" th:text="#{mem1.mod.blk.type.login}"></label>
+									<input type="checkbox" id="mb_blk_type_trade" name="mb_blk_type" value="TRADE" /><label for="mb_blk_type_trade" th:text="#{mem1.mod.blk.type.trade}"></label>
+									<input type="checkbox" id="mb_blk_type_deposit" name="mb_blk_type" value="DEPOSIT" /><label for="mb_blk_type_deposit" th:text="#{mem1.mod.blk.type.deposit}"></label>
+									<input type="checkbox" id="mb_blk_type_withdraw" name="mb_blk_type" value="WITHDRAW" /><label for="mb_blk_type_withdraw" th:text="#{mem1.mod.blk.type.withdraw}"></label>
+								</dd>
+							</dl>
+							<!-- //finalConfirm -->
+						</form>
+					</div>
+					<p class="popButton">
+						<a href="javascript: addBlackConumer();" class="popConfirm" th:text="#{registration}"></a>
+						<a href="javascript: closeBlackConsumerPopup();" class="popBlackConsumerCancel" th:text="#{cancel.btn}" style=""></a>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // blackconsumer popup -->
+
+
+	<!-- blackconsumer release popup -->
+	<div class="popupArea" id="releaseBlackConsumerPopup" style="display: none;">
+		<div class="dim"></div>
+		<div class="popupLayer">
+			<div class="popup">
+				<div class="box 430">
+					<p class="popTit" th:text="#{status.BLK} + ' ' + #{mem1.mod.blackconsumer.state.1}"></p>
+					<div class="popCont">
+						<form name="releaseBlackconsumerForm" id="releaseBlackconsumerForm" action="javascript:;">
+							<!-- finalConfirm -->
+							<dl class="fc-elem">
+								<dt th:text="#{mem1.table.thead.th.mb_id}"></dt>
+								<dd>
+								<span class="typeText">
+									<input type="text" name="mb_id" id="blk_release_mb_id" readonly />
+								</span>
+								</dd>
+							</dl>
+							<dl class="fc-elem">
+								<dt th:text="#{mem1.mod.sub.release.memo}"></dt>
+								<dd class="pushTalble">
+									<span class="typeText">
+										<input type="text" name="memo" id="memo" onchange="checkBytes(this, this.value, 30, document.getElementById('bytesMemo'));"
+											   onkeyup="return checkBytes(this, this.value, 30, document.getElementById('bytesMemo'));"/>
+										<span class="byte">
+											<span id="bytesMemo">0</span> byte
+										</span>
+									</span>
+								</dd>
+							</dl>
+							<!-- //finalConfirm -->
+						</form>
+					</div>
+					<p class="popButton">
+						<a href="javascript: releaseBlackConumer();" class="popConfirm" th:text="#{registration}"></a>
+						<a href="javascript:void(0);" class="popCancel" th:text="#{cancel.btn}"></a>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- // extrapaylimit popup -->
+	<div class="popupArea" id="extrapaylimitPopup" style="display: none;">
+        <div class="dim"></div>
+        <div class="popupLayer">
+            <div class="popup">
+                <div class="box pop340">
+                    <p class="popTit" th:text="#{mem1.mod.extrapay_limit_regist}"></p>
+                    <div class="popCont">						
+                        <!-- 수당 상한액 변경 -->						
+                        <div class="withdrawalBox">     							
+							<input type="hidden" id="extrapaylimit_mb_no">     							
+                            <dl>                                
+                                <dd>
+								<span class="typeText">
+									<input type="text" name="extrapay_limit" id="extrapay_limit" onchange="numberWithCommas(this.value, this, null, 0.00, 10000000000, 0)" onkeypress="return isNumberKey(event)"/>
+								</span>
+								<mark>LST</mark>
+								</dd>
+                            </dl>							
+                        </div>
+                        <!-- //수당 상한액 변경 -->
+                    </div>
+                    <p class="popButton">
+                        <a href="javascript:extrapay_limit_change_request();" class="popConfirm" th:text="#{request}"></a>
+                        <a href="javascript:void(0);" class="popCancel" th:text="#{cancel.btn}"></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+	<!-- // extrapaylimit popup -->
+
+
+
+	<!-- // withdrawlimit popup -->
+	<div class="popupArea" id="withdrawlimitPopup" style="display: none;">
+		<div class="dim"></div>
+		<div class="popupLayer">
+			<div class="popup">
+				<div class="box pop340">
+					<p class="popTit" th:text="#{mem1.table.thead.th.withdraw_limit_btn}"></p>
+					<div class="popCont">
+						<!-- 출금가능금액 변경 -->
+						<div class="withdrawalBox">
+							<input type="hidden" id="withdrawlimit_mb_no">
+							<dl>
+								<dd>
+								<span class="typeText">
+									<input type="text" name="withdraw_limit" id="withdraw_limit" onchange="numberWithCommas(this.value, this, null, 0, 100, 0)" onkeypress="return isNumberKey(event)"/>
+								</span>
+									<mark>%</mark>
+								</dd>
+							</dl>
+						</div>
+						<!-- //출금가능금액 변경 -->
+					</div>
+					<p class="popButton">
+						<a href="javascript:withdraw_limit_change_request();" class="popConfirm" th:text="#{request}"></a>
+						<a href="javascript:void(0);" class="popCancel" th:text="#{cancel.btn}"></a>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // withdrawlimit popup -->
+
+
+	<!-- // email edit popup -->
+	<div class="popupArea" id="emailEditPopup" style="display: none;">
+		<div class="dim"></div>
+		<div class="popupLayer">
+			<div class="popup">
+				<div class="box pop340">
+					<p class="popTit" th:text="#{mem1.mod.sub.email_edit}"></p>
+					<div class="popCont">
+						<div class="withdrawalBox">
+							<input type="hidden" id="emailEdit_mb_no">
+							<dl>
+								<dd class="typeText">
+									<input type="text" name="mb_email" id="mb_email" onchange="valid_email();" onkeyup="return valid_email();" style="width:100%;"/>
+								</dd>
+								<dd id="emailValid" style="color:#ff0000;"></dd>
+							</dl>
+						</div>
+					</div>
+					<p class="popButton">
+						<a href="javascript:email_change_request();" class="popConfirm" th:text="#{request}"></a>
+						<a href="javascript:void(0);" class="popCancel" th:text="#{cancel.btn}"></a>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // email edit popup -->
+
+
+	<!-- // referrer Id edit popup -->
+	<div class="popupArea" id="referrerIdPopup" style="display: none;">
+		<div class="dim"></div>
+		<div class="popupLayer">
+			<div class="popup">
+				<div class="box pop340">
+					<p class="popTit" th:text="#{mem1.mod.sub.referrer.id}"></p>
+					<div class="popCont">
+						<div class="withdrawalBox">
+							<input type="hidden" id="referrerId_self">
+							<dl>
+								<dd class="typeText">
+									<input type="text" name="referrer_id" id="referrerId_parent" onblur="referrerId_Search();" style="width:100%;"/>
+								</dd>
+								<dd id="referrerIdValid" style="color:#ff0000;"></dd>
+							</dl>
+						</div>
+					</div>
+					<p class="popButton">
+						<a href="javascript:referrerId_Proc();" class="popConfirm" th:text="#{request}"></a>
+						<a href="javascript:void(0);" class="popCancel" th:text="#{cancel.btn}"></a>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // referrer Id edit popup -->
+</th:block>
+
+
+<th:block layout:fragment="script">
+	<script type="text/javascript" src="/js/datepicker.min.js"></script>
+	<script type="text/javascript" src="/js/i18n/datepicker.ko.js"></script>
+	<script type="text/javascript" src="/js/i18n/datepicker.en.js"></script>
+	<script type="text/javascript" src="/js/rsa/rsa.js"></script>
+	<script type="text/javascript" src="/js/rsa/jsbn.js"></script>
+	<script type="text/javascript" src="/js/rsa/prng4.js"></script>
+	<script type="text/javascript" src="/js/rsa/rng.js"></script>
+	<script type="text/javascript" src="/js/member/mem1_mod.js"></script>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script type="text/javascript" src="/js/jquery.mockjax.min.js"></script>
+	<script type="text/javascript" src="/js/jquery.orgchart.js"></script>
+	<script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var lang = [[${#locale}]];
+        var STR_REQUEST_FAIL = [[#{import.requestfail}]];
+        var STR_REQUEST_SUCCESS = [[#{import.reuqestsuccess}]];
+        var STR_RESET_PASSWORD = [[#{mem1.mod.reset_password}]];
+        var STR_RESEND_RECOVERY_CODE = [[#{mem1.mod.resend_recovery_code}]];
+        var ALERT_MESSAGE_13= [[#{mem4.alert.message.13}]];
+        var CLEARCERT_1 = [[#{mem1.mod.clearCert.1}]];
+        var CLEARCERT_2 = [[#{mem1.mod.clearCert.2}]];
+        var CLEARCERT_3 = [[#{mem1.mod.clearCert.3}]];
+		var CLEARCERT_4 = [[#{mem1.mod.clearCert.4}]];
+		var ALERT_MESSAGE_SELECT_END_DATE = [[#{sys7.alert.msg.2}]];
+		var ALERT_MESSAGE_SELECT_BLT_TYPE = [[#{mem1.mod.alert.msg.1}]];
+		var ALERT_MESSAGE_INPUT_MEMO = [[#{mem1.mod.alert.msg.2}]];
+		var ALERT_MESSAGE_CANCEL_POP = [[#{mem1.mod.alert.msg.3}]];
+		var CHANGE_EXTRAPAY_LIMIT_DT = [[#{mem1.mod.sub.update_extrapay_limit_dt}]];
+		var SUCCESS_EXTRAPAY_LIMIT_DT = [[#{mem1.mod.sub.success_extrapay_limit_dt}]];
+		var CHANGE_WITHDRAW_LIMIT_DT = [[#{mem1.mod.sub.update_withdraw_limit_dt}]];
+		var SUCCESS_WITHDRAW_LIMIT_DT = [[#{mem1.mod.sub.success_withdraw_limit_dt}]];
+		var CHANGE_EMAIL = [[#{mem1.mod.sub.update_email}]];
+		var CHANGE_EMAIL_BLANK = [[#{mem1.mod.sub.email_blank}]];
+		var EMAIL_VALID_NO = [[#{mem1.mod.sub.email_valid_no}]];
+		var SUCCESS_CHANGE_EMAIL = [[#{mem1.mod.sub.success_update_email}]];
+		var AUTH_EMAIL_RESEND = [[#{mem1.mod.sub.email_resend_msg}]];
+		var SUCCESS_AUTH_EMAIL_RESEND = [[#{mem1.mod.sub.success_email_resend}]];
+		var REFERRER_ID_BLANK = [[#{mem1.referrer.id.blank}]];
+		var CHANGE_REFERRER_ID = [[#{mem1.referrer.id.change}]];
+		var SUCCESS_REFERRER_ID = [[#{mem1.referrer.id.change.success}]];
+		var REFERRER_ID_SEARCH_NO = [[#{mem1.referrer.id.change.search.no}]];
+		var REFERRER_ID_SEARCH_OK = [[#{mem1.referrer.id.change.search.ok}]];
+
+        var temp = [[${memberInfo}]];
+
+        /* 알림창 메세지 가져오기 */
+        function getMessage(index) {
+            var message = '';
+
+            switch (index) {
+                case 1:
+                    message = [[#{processed.message}]];
+                    break;
+                case 2:
+                    message = [[#{login.alert.text.pwd}]];
+                    break;
+                case 3:
+                    message = [[#{login.alert.text.chk}]];
+                    break;
+                default:
+                    break;
+            }
+            return message;
+        }
+		/*]]>*/
+	</script>
+</th:block>
+</body>
+</html>

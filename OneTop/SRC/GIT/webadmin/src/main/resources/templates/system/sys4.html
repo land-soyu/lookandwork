@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+    <title th:text="#{sys4.title}"></title>
+    <th:block layout:fragment="css">
+
+    </th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+    <div th:replace="include/menu :: system"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+    <th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+    <div class="contSection" th:if="${securityYN}=='Y'">
+        <h2 class="tit_h2" th:text="#{sys4.h2}"></h2>
+        <p class="topButton" th:if="${mode} == 'modify'">
+            <a href="javascript:checkImport();" class="btnType" th:text="#{import.btn}"></a>
+        </p>
+        <p class="topButton" th:unless="${mode} == 'modify'">
+            <a href="javascript:checkModify()" class="btnType" th:if="${member_proc.role == 0}" th:text="#{modify.btn}"></a>
+        </p>
+
+        <div class="tableStyle aCenter head2 inputArea mb20">
+            <table>
+                <colgroup>
+                    <col style="width: 5%;" />
+                    <col style="width: 7%;" />
+                    <col style="width: 17.6%;" />
+                    <col style="" />
+
+
+                </colgroup>
+                <thead>
+                <tr>
+                    <th rowspan="2" th:text="#{coin.code}"></th>
+                    <th rowspan="2" colspan="2" th:text="#{coin.unit}"></th>
+                    <th rowspan="2">
+                        <span th:text="#{sys4.table.thead.th.withdraw_limit_min}"></span>
+                        <br/>
+                        <span th:text="#{sys4.table.thead.th.withdraw_limit_min_tail}"></span>
+                    </th>
+                    <th colspan="2">
+                        <span  th:text="#{sys4.table.thead.th.withdraw_limit_day}"></span>
+                        <br/>
+                        <span  th:text="#{sys4.table.thead.th.withdraw_limit_day_tail}"></span>
+                    </th>
+                </tr>
+                <tr>
+                    <th th:text="#{sys4.table.thead.th.withdraw_limit_day_account}"></th>
+                    <th th:text="#{sys4.table.thead.th.withdraw_limit_day_id_card}"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="systemBox4" th:if="${#lists.size(withdrawLimit)} > 0" th:each="limit, iter : ${withdrawLimit}">
+                    <td th:id="${'coin_no_' + iter.index}" th:text="${limit.coin_no}"></td>
+                    <td colspan="2" th:id="${'coin_name_' + iter.index}" th:text="${limit.coin_name}"></td>
+
+                    <td th:if="${mode} == 'modify'"><span class="typeText"><input type="text" th:id="${'withdraw_limit_min_' + iter.index}" placeholder="숫자 입력"  th:value="${#numbers.formatDecimal(limit.withdraw_limit_min, 1, 'COMMA', 4, 'POINT')}" th:onchange="'numberWithCommas(this.value, this, null, 0.00000000, 999999999999, 4)'" onkeypress="return isNumberKey(event)" /></span></td>
+                    <td th:unless="${mode} == 'modify'" th:id="${'withdraw_limit_min_' + iter.index}" th:text="${#numbers.formatDecimal(limit.withdraw_limit_min, 1, 'COMMA', 4, 'POINT')}"></td>
+
+                    <td th:if="${mode} == 'modify' and ${limit.coin_name} == 'BTC'"><span class="typeText"><input type="text" th:id="${'withdraw_limit_day_account_' + iter.index}" placeholder="숫자 입력"  th:value="${#numbers.formatDecimal(limit.withdraw_limit_day_account, 1, 'COMMA', 0, 'POINT')}" th:onchange="'numberWithCommas(this.value, this, null, 0.00000000, 999999999999, 0, null, null, \'withdraw_limit_day_account_\',' + ${#lists.size(withdrawLimit) - 1} +' )'" onkeypress="return isNumberKey(event)" /></span></td>
+                    <td th:unless="${mode} == 'modify' and ${limit.coin_name} == 'BTC'" th:id="${'withdraw_limit_day_account_' + iter.index}" th:text="${#numbers.formatDecimal(limit.withdraw_limit_day_account, 1, 'COMMA', 0, 'POINT')}"></td>
+
+                    <td th:if="${mode} == 'modify' and ${limit.coin_name} == 'BTC'"><span class="typeText"><input type="text" th:id="${'withdraw_limit_day_id_card_' + iter.index}" placeholder="숫자 입력"  th:value="${#numbers.formatDecimal(limit.withdraw_limit_day_id_card, 1, 'COMMA', 0, 'POINT')}" th:onchange="'numberWithCommas(this.value, this, null, 0.00000000, 999999999999, 0, null, null, \'withdraw_limit_day_id_card_\',' + ${#lists.size(withdrawLimit) - 1} +' )'" onkeypress="return isNumberKey(event)" /></span></td>
+                    <td th:unless="${mode} == 'modify' and ${limit.coin_name} == 'BTC'" th:id="${'withdraw_limit_day_id_card_' + iter.index}" th:text="${#numbers.formatDecimal(limit.withdraw_limit_day_id_card, 1, 'COMMA', 0, 'POINT')}"></td>
+                </tr>
+                <tr class="systemBox4" th:if="${#lists.size(krwWithdrawLimit)} > 0" th:each="krwLimit, iter : ${krwWithdrawLimit}">
+                    <td th:id="${'coin_no_krw'}" th:text="${krwLimit.coin_no}"></td>
+                    <td colspan="2" th:id="${'coin_name_krw'}" th:text="${krwLimit.coin_name}"></td>
+
+                    <td th:if="${mode} == 'modify'"><span class="typeText"><input type="text" th:id="${'withdraw_limit_min_krw'}" placeholder="숫자 입력"  th:value="${#numbers.formatDecimal(krwLimit.withdraw_limit_min, 1, 'COMMA', 4, 'POINT')}" th:onchange="'numberWithCommas(this.value, this, null, 0.00000000, 999999999999, 4)'" onkeypress="return isNumberKey(event)" /></span></td>
+                    <td th:unless="${mode} == 'modify'" th:id="${'withdraw_limit_min_krw'}" th:text="${#numbers.formatDecimal(krwLimit.withdraw_limit_min, 1, 'COMMA', 4, 'POINT')}"></td>
+
+                    <td th:if="${mode} == 'modify'"><span class="typeText"><input type="text" th:id="${'withdraw_limit_day_account_krw'}" placeholder="숫자 입력"  th:value="${#numbers.formatDecimal(krwLimit.withdraw_limit_day_account, 1, 'COMMA', 0, 'POINT')}" th:onchange="'numberWithCommas(this.value, this, null, 0.00000000, 999999999999, 0)'" onkeypress="return isNumberKey(event)" /></span></td>
+                    <td th:unless="${mode} == 'modify'" th:id="${'withdraw_limit_day_account_krw'}" th:text="${#numbers.formatDecimal(krwLimit.withdraw_limit_day_account, 1, 'COMMA', 0, 'POINT')}"></td>
+
+                    <td th:if="${mode} == 'modify'"><span class="typeText"><input type="text" th:id="${'withdraw_limit_day_id_card_krw'}" placeholder="숫자 입력"  th:value="${#numbers.formatDecimal(krwLimit.withdraw_limit_day_id_card, 1, 'COMMA', 0, 'POINT')}" th:onchange="'numberWithCommas(this.value, this, null, 0.00000000, 999999999999, 0)'" onkeypress="return isNumberKey(event)" /></span></td>
+                    <td th:unless="${mode} == 'modify'" th:id="${'withdraw_limit_day_id_card_krw'}" th:text="${#numbers.formatDecimal(krwLimit.withdraw_limit_day_id_card, 1, 'COMMA', 0, 'POINT')}"></td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+        <div class="buttonRight" th:if="${mode} == 'modify'">
+            <a href="sys4" class="btnType" id="cancel" th:text="#{cancel.btn}"></a>
+        </div>
+    </div>
+    <!-- //contSection -->
+</div>
+
+<th:block layout:fragment="script">
+    <script type="text/javascript" src="/js/include/menu_system.js"></script>
+    <script type="text/javascript" src="/js/system/sys4.js"></script>
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var STR_Q_IMPORT = [[#{import.message}]];
+        var STR_Q_MODIFY = [[#{sys4.q.modify}]];
+        var STR_NOT_ENOUGH_PARAMS =[[#{import.notenoughparams}]];
+        var STR_REQUEST_FAIL=[[#{import.requestfail}]];
+        var STR_REQUEST_SUCCESS=[[#{import.reuqestsuccess}]];
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+<title th:text="#{bank31.title}"></title>
+<th:block layout:fragment="css"></th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+    <div th:replace="include/menu :: banking"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+    <th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+    <div class="contSection" th:if="${securityYN}=='Y'" id="contentView1">
+        <form action="bank31" name="search_bank31_form" id="search_bank31_form" method="POST">
+            <input type="hidden" name="sortName" th:value="${sortName}"/>
+            <input type="hidden" name="sortOrderBy" th:value="${sortOrderBy}"/>
+            <input type="hidden" name="page" id="page" th:value="${page}" />
+            <input type="hidden" name="total" id="total" th:value="${response.counts.search}" />
+            <input type="hidden" name="searchValue" id="searchValue" th:value="${searchValue}" />
+            <input type="hidden" id="mg_id" th:value="${member_proc.id}"/>
+            <div th:if="${searchValue}==''">
+                <h2 class="tit_h2" th:text="#{bank31.h2}"></h2>
+                <div class="tableStyle2 bankInfo mb20">
+                    <table>
+                        <colgroup>
+                            <col style="width: 17%;" />
+                            <col style="width: 33%;" />
+                            <col style="width: 17%" />
+                            <col style="width: 33%" />
+                        </colgroup>
+                        <tbody>
+                        <tr>
+                            <th th:text="#{member.id}"></th>
+                            <td><span class="typeText"><input name="mb_id" type="text" th:placeholder="#{member.id}" th:value="${mb_id}"/></span></td>
+                            <th th:text="#{bank31.table.request_date} + ' *'"> *</th>
+                            <td>
+                                <a href="javascript: setDateChoiceChange(0);"  class="dateSelectBtn2" th:text="#{bank31.date.select.btn.1}"></a>
+                                <a href="javascript: setDateChoiceChange(2);"  class="dateSelectBtn2" th:text="#{bank31.date.select.btn.2}"></a>
+                                <p class="dateChoice2">
+                                     <span>
+                                        <img src="/images/calendar_icon.png"/>
+                                        <input id="req_dt" name="req_dt" type="text" class="datepicker-here"
+                                               data-range="true"
+                                               data-multiple-dates-separator=" - "
+                                               th:data-language="${#locale}"
+                                               placeholder="YYYY.MM.DD - YYYY.MM.DD"
+                                               th:value="${req_dt != null} ? ${req_dt} : ''"
+                                        />
+                                    </span>
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th th:text="#{bank31.table.thead.th.od_request_address}"></th>
+                            <td>
+                                <span class="typeText"><input type="text" name="od_request_address" th:placeholder="#{bank31.table.thead.th.od_request_address}" th:value="${od_request_address}"/></span>
+                            </td>
+                            <th th:text="#{bank31.table.coin} + ' *'"></th>
+                            <td class="sortTable">
+                                <span class="typeSelect">
+                                    <select name="coin_name">
+                                        <option th:text="#{all}" value="ALL" th:selected="${coin_name}=='ALL' ? 'true' : 'false'"></option>
+                                        <th:block th:if="${#lists.size(response.coinList)} > 0" th:each="coin : ${response.coinList}">
+                                            <option th:attr="value=${coin.coin_name}" th:selected="(${coin_name}==${coin.coin_name}) ? 'true' : 'false'" th:text="${coin.coin_name}"></option>
+                                        </th:block>
+                                    </select>
+                                </span>
+                            </td>
+                        </tr>
+                        <!--
+                        <tr>
+                            <th th:text="#{mem1.wallet.destination}"></th>
+                            <td>
+                                <span class="typeText"><input type="text" name="withdraw_memo" th:placeholder="#{mem1.wallet.destination}" th:value="${withdraw_memo}" /></span>
+                            </td>
+                        </tr>
+                        -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="buttonRight mb50">
+                    <a href="javascript:void(0);" class="btnType" id="search_bank31_btn" th:text="#{search.btn}"></a>
+                </div>
+                <div class="listCountWrap">
+                    <h3 class="tit_h3" th:if="${#locale.toString()} == 'ko'" th:text="#{cnt.search} + ' ' + ${response.counts.search}  + #{cnt}"></h3>
+                    <h3 class="tit_h3" th:if="${#locale.toString()} == 'en'" th:text="${response.counts.search} + ' ' + #{cnt.search}"></h3>
+                    <span class="typeSelect">
+                        <a href="javascript:void(0);" id="bank31_excel_down_btn" class="btnType" th:text="#{excel.download.btn}">Excel D/L</a>
+                        <select name="search_listCount" id="searchListCount">
+                            <option value="10" th:selected="${search_listCount == 10}">10</option>
+                            <option value="30" th:selected="${search_listCount == 30}">30</option>
+                            <option value="50" th:selected="${search_listCount == 50}">50</option>
+                            <option value="100" th:selected="${search_listCount == 100}">100</option>
+                            <option value="1000" th:selected="${search_listCount == 1000}">1000</option>
+                        </select>
+                    </span>
+                </div>
+                <div class="tableStyle bankInfo aCenter head2 font13 mb20 fitTable">
+                    <table>
+                        <colgroup>
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th style="min-width: 20px;"><input class="listCheck" type="checkbox" id="checkNo_all" th:onclick="|checkedAll(this.checked)|"><label for="checkNo_all"><span class="hide" th:text="#{select}"></span></label></th>
+                            <th th:text="#{number_}"></th>
+                            <th th:text="#{bank31.table.request_date}"></th>
+                            <th th:text="#{member.id}"></th>
+                            <th><p class="orderby"><span th:text="#{bank31.table.coin.withdraw}"></span> <button type="button" id="coin_name" onclick="orderBy(this.id);" th:style="${sortName == 'coin_name'} ? 'color:red;' : ''" th:text="${sortName == 'coin_name' and sortOrderBy == 'ASC'} ? #{orderby.asc} : #{orderby.desc}"></button></p></th>
+                            <th th:text="#{bank31.table.thead.th.amount}"></th>
+                            <th><p class="orderby"><span th:text="#{bank31.table.thead.th.od_request_address}"></span> <button type="button" id="withdraw_address" onclick="orderBy(this.id);" th:style="${sortName == 'withdraw_address'} ? 'color:red;' : ''" th:text="${sortName == 'withdraw_address' and sortOrderBy == 'ASC'} ? #{orderby.asc} : #{orderby.desc}"></button></p></th>
+                            <th style="min-width: 50px;"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.size(response.withdrawRequestList)} > 0" th:each="withdrawRequest, iter : ${response.withdrawRequestList}" th:class="${withdrawRequest.status == 'REQ'} ? 'bgRed' : (${withdrawRequest.status == 'HOLD'} ? 'bgOrange' : '')">
+                            <td ><input class="listCheck" type="checkbox" name="checkNo" th:id="'checkNo_' + ${withdrawRequest.idx}" th:value="${withdrawRequest.idx+'|'+withdrawRequest.coin_name+'|'+withdrawRequest.withdraw_address}"><label th:for="|checkNo_| + ${withdrawRequest.idx}"><span class="hide" th:text="#{select}"></span></label></td>
+                            <td th:text="${withdrawRequest.idx}"></td>
+                            <td>
+                                <span th:text="${#dates.format(withdrawRequest.create_dt, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                            </td>
+                            <td th:text="${withdrawRequest.mb_id}"></td>
+                            <td th:text="${withdrawRequest.coin_name}"></td>
+                            <td th:text="${#numbers.formatDecimal(withdrawRequest.withdraw_amount, 1, 'COMMA', 4, 'POINT') + ' ' +withdrawRequest.coin_name} "></td>
+                            <td th:text="${withdrawRequest.withdraw_address}"></td>
+                            <td >
+                                <a th:href="|javascript:contentViewOffDisplay('${withdrawRequest.idx}', '${withdrawRequest.mb_no}', '${withdrawRequest.mb_id}', '${withdrawRequest.create_dt}', '${withdrawRequest.coin_name}',
+                                 '${withdrawRequest.withdraw_address}', '${withdrawRequest.withdraw_amount}', '${withdrawRequest.fee}', '${withdrawRequest.quote_amount}');|" id="menu_bank31" class="dateSelectBtn" th:text="#{bank31.date.select.btn.list}"></a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pageFoot mb50">
+                    <!--<p class="footText mb15">[ 최종 동기화 : YYYY.MM.DD 23:59:00 ]</p>-->
+                    <ul class="footList">
+                        <li th:text="#{footer.message.1}"></li>
+                    </ul>
+                </div>
+                <div class="pageFoot inPaging">
+                    <div class="paging">
+                        <a href="javascript: goPage('1', '#search_bank31_form');" class="prevBt"></a>
+                        <a th:if="${response.pageNaviResponse.isPrev == 1}" href="javascript: goPrePage('#search_bank31_form');" class="beforeBt"></a>
+                        <a th:if="${response.pageNaviResponse.isPrev != 1}" href="javascript:;" class="beforeBt"></a>
+                        <ul th:each="index: ${#numbers.sequence(response.pageNaviResponse.decadeFirst, response.pageNaviResponse.decadeLast)}">
+                            <li th:class="${response.pageNaviResponse.current_page == index ? 'on' : ''}"><a th:href="@{'javascript: goPage(' + ${index} + ', \'#search_bank31_form\');'}" th:text="${index}"></a></li>
+                        </ul>
+                        <a th:if="${response.pageNaviResponse.isNext == 1}" href="javascript: goNextPage('#search_bank31_form');" class="afterBt"></a>
+                        <a th:if="${response.pageNaviResponse.isNext != 1}" href="javascript:;" class="afterBt"></a>
+                        <a th:href="@{'javascript: goPage(' + ${response.pageNaviResponse.lastPage} + ', \'#search_bank31_form\');'}" href="javascript: goPage();" class="nextBt"></a>
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    <a href="javascript:contentView3OnDisplay();"  class="requestTotalBtn" id="totalRequest" th:text="#{bank31.request.total}"></a>
+                </div>
+            </div>
+            <div th:if="${searchValue}!=''">
+                <h2 class="tit_h2" th:text="#{bank313.h2}"></h2>
+                <div class="listCountWrap">
+                    <h3 class="tit_h3" th:text="#{bank313.content3.withdraw.data}"></h3>
+                </div>
+                <div class="tableStyle2 bankInfo mb20">
+                    <table>
+                        <colgroup>
+                            <col style="width: 30%;" />
+                            <col style="width: 70%;" />
+                        </colgroup>
+                        <tbody>
+                            <tr>
+                                <th th:text="#{bank31.content2.table.withdraw.coin_name}"></th>
+                                <td id="content3_withdraw_coin_name" th:text="${response.withdrawRequestList.get(0).coin_name}"></td>
+                            </tr>
+                            <tr>
+                                <th th:text="#{bank31.table.thead.th.amount}"></th>
+                                <td id="content3_withdraw_amount" th:text="${#numbers.formatDecimal(all_amount, 1, 'COMMA', 4, 'POINT')+' '+response.withdrawRequestList.get(0).coin_name}"></td>
+                            </tr>
+                            <tr>
+                                <th th:text="#{bank31.content2.table.withdraw.request_address}"></th>
+                                <td id="content3_withdraw_address" th:text="${response.withdrawRequestList.get(0).withdraw_address}"></td>
+                            </tr>
+                            <tr>
+                                <th th:text="#{bank313.content3.withdraw.request.count}"></th>
+                                <td id="content3_withdraw_count" th:text="${response.counts.search}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="listCountWrap">
+                    <h3 class="tit_h3" th:text="#{bank313.content3.withdraw.request.data}"></h3>
+                    <span class="typeSelect">
+                        <a href="javascript:void(0);" id="bank313_excel_down_btn" class="btnType" th:text="#{excel.download.btn}">Excel D/L</a>
+                    </span>        
+                </div>
+                <div class="tableStyle bankInfo aCenter head2 font13 mb20 fitTable">
+                    <table>
+                        <colgroup>
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th th:text="#{number_}"></th>
+                            <th th:text="#{bank31.table.request_date}"></th>
+                            <th th:text="#{member.id}"></th>
+                            <th th:text="#{bank31.table.thead.th.amount}"></th>
+                            <th th:text="#{bank31.content2.table.withdraw.use_point}"></th>
+                            <th th:text="#{fee}"></th>
+                            <th th:text="#{sys2.rate}"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.size(response.withdrawRequestList)} > 0" th:each="withdrawRequest, iter : ${response.withdrawRequestList}" th:class="${withdrawRequest.status == 'REQ'} ? 'bgRed' : (${withdrawRequest.status == 'HOLD'} ? 'bgOrange' : '')">
+                            <td th:text="${withdrawRequest.idx}"></td>
+                            <td>
+                                <span th:text="${#dates.format(withdrawRequest.create_dt, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                            </td>
+                            <td th:text="${withdrawRequest.mb_id}"></td>
+                            <td th:text="${#numbers.formatDecimal(withdrawRequest.withdraw_amount, 1, 'COMMA', 4, 'POINT') + ' ' +withdrawRequest.coin_name} "></td>
+                            <td th:text="${withdrawRequest.amount + ' P'}"></td>
+                            <td th:text="${withdrawRequest.fee}"></td>
+                            <td th:text="${'1$ = '+withdrawRequest.quote_amount+withdrawRequest.coin_name}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="text-align: center;">
+                    <a th:href="|javascript: toAllApprove('${searchValue}', '${all_amount}', '${member_proc.id}');|"  class="requestTotalBtn" th:text="#{approved}"></a>
+                    <a href="javascript: popupAllExchange();"  class="requestTotalBtn" th:text="#{bank41.search.exchange.withdraw}"></a>
+                    <a href="javascript: popupAllReject();"  class="requestTotalBtn" th:text="#{bank31.content2.reject}"></a>
+                    <a href="javascript: contentView3OffDisplay();"  class="requestTotalBtn" th:text="#{bank31.content2.list}"></a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- content view 2 -->
+    <div class="contSection" th:if="${securityYN}=='Y'" id="contentView2" hidden>
+        <h2 class="tit_h2" th:text="#{bank31.h2}"></h2>
+        <div class="tableStyle2 bankInfo mb20">
+            <table>
+                <colgroup>
+                    <col style="width: 30%;" />
+                    <col style="width: 70%;" />
+                </colgroup>
+                <tbody>
+                    <tr>
+                        <th th:text="#{bank31.content2.member.no}"></th>
+                        <td id="content2_member_no" th:text="회원번호"></td>
+                    </tr>
+                    <tr>
+                    <th th:text="#{member.id}"></th>
+                    <td id="content2_member_id" th:text="#{member.id}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <div style="text-align: center;">
+                <!-- <a th:href="'javascript:show_member_detail(\'' + ${withdrawRequest.mb_id} + '\')'"  class="requestTotalBtn" th:text="#{bank31.content2.member.view}"></a> -->
+                <a th:href="'javascript:show_member_detail_no_41()'"  class="requestTotalBtn" th:text="#{bank31.content2.member.view}"></a>
+            </div>
+        </div>
+        <div class="listCountWrap">
+            <h3 class="tit_h3" th:text="#{bank31.content2.withdraw.data}"></h3>
+            <span class="typeSelect">
+                <a href="javascript: popupRecord();" class="btnType" th:text="#{bank31.content2.withdraw.old.data}"></a>
+            </span>
+        </div>
+        <div class="tableStyle2 bankInfo mb20">
+            <table>
+                <colgroup>
+                    <col style="width: 30%;" />
+                    <col style="width: 70%;" />
+                </colgroup>
+                <tbody>
+                    <tr>
+                        <th th:text="#{bank31.content2.table.withdraw.request_date}"></th>
+                        <td id="content2_withdraw_request_date" th:text="출금신청일시"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank31.content2.table.withdraw.coin_name}"></th>
+                        <td id="content2_coin_name" th:text="#{member.id}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank31.content2.table.withdraw.request_address}"></th>
+                        <td id="content2_request_address" th:text="#{member.id}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank31.table.thead.th.amount}"></th>
+                        <td id="content2_amount" th:text="#{member.id}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank31.content2.table.withdraw.use_point}"></th>
+                        <td id="content2_use_point" th:text="#{member.id}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{fee}"></th>
+                        <td id="content2_fee" th:text="수수료"></td>
+                    </tr>
+                        
+                </tbody>
+            </table>
+        </div>
+        <div style="text-align: center;">
+            <a href="javascript: popupApprove();"  class="requestTotalBtn" th:text="#{approved}"></a>
+            <a href="javascript: popupExchange();"  class="requestTotalBtn" th:text="#{bank41.search.exchange.withdraw}"></a>
+            <a href="javascript: popupReject();"  class="requestTotalBtn" th:text="#{bank31.content2.reject}"></a>
+            <a href="javascript: contentViewOnDisplay();"  class="requestTotalBtn" th:text="#{bank31.content2.list}"></a>
+        </div>
+    </div>
+
+    <!-- //contSection -->
+</div>
+
+<!-- //contents -->
+<th:block layout:fragment="side">
+    <!-- 기존 출금 내역 확인 팝업 -->
+    <div class="popupArea" id="recordPopup" >
+        <div class="dim"></div>
+        <div class="popupLayer">
+            <div class="popup">
+                <div class="box pop530">
+                    <form action="ajax/bank31/record" method="post" name="select_bank31_form" id="select_bank31_form">
+                        <div class="popCont">
+                            <!-- 최근 출금 내역 확인 -->
+                            <dl class="dw_regist">
+                                <dt th:text="'최근 출금 내역 확인'"></dt>
+                                <div class="tableStyle2 bankInfo mb20">
+                                    <table>
+                                        <colgroup>
+                                            <col style="width: 30%;" />
+                                            <col style="width: 70%;" />
+                                        </colgroup>
+                                        <tbody>
+                                            <tr>
+                                                <th th:text="#{bank31.content2.table.withdraw.request_date}"></th>
+                                                <td id="content2_old_request_date" th:text="출금신청일시"></td>
+                                            </tr>
+                                            <tr>
+                                                <th th:text="#{bank31.content2.table.withdraw.coin_name}"></th>
+                                                <td id="content2_old_coin_name" th:text="#{member.id}"></td>
+                                            </tr>
+                                            <tr>
+                                                <th th:text="#{bank31.content2.table.withdraw.request_address}"></th>
+                                                <td id="content2_old_request_address" th:text="#{member.id}"></td>
+                                            </tr>
+                                            <tr>
+                                                <th th:text="#{bank31.content2.table.withdraw.use_point}"></th>
+                                                <td id="content2_old_use_point" th:text="#{member.id}"></td>
+                                            </tr>
+                                            <tr>
+                                                <th th:text="#{fee}"></th>
+                                                <td id="content2_old_fee" th:text="수수료"></td>
+                                            </tr>
+                                                
+                                        </tbody>
+                                    </table>
+                                </div>                       
+                            </dl>
+                        </div>
+                        <p class="popButton">
+                            <a href="javascript:;" class="popConfirm" th:text="#{confirm.btn}"></a>
+                            <a href="javascript:;" class="popCancel" th:text="#{cancel.btn}"></a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- //기존 출금 내역 확인 팝업 -->
+    <!-- 승인 팝업 -->
+    <div class="popupArea" id="approvePopup" >
+        <div class="dim"></div>
+        <div class="popupLayer">
+            <div class="popup">
+                <div class="box pop530">
+                    <form action="ajax/bank31/add" method="post" name="insert_mem18_form" id="insert_mem18_form">
+                        <div class="popCont">
+                            <!-- 상담이력 등록 및 할인 -->
+                            <dl class="dw_regist">
+                                <dt th:text="'승인'"></dt>
+                                <div class="tableStyle2 bankInfo mb20">
+                                    <table>
+                                        <colgroup>
+                                            <col style="width: 30%;" />
+                                            <col style="width: 70%;" />
+                                        </colgroup>
+                                        <tbody>
+                                            <tr>
+                                                <th th:text="#{bank31.content2.table.withdraw.coin_name}"></th>
+                                                <td id="approvePopup_coin_name" th:text="#{member.id}"></td>
+                                            </tr>
+                                            <tr>
+                                                <th th:text="#{bank31.content2.table.withdraw.request_address}"></th>
+                                                <td id="approvePopup_request_address" th:text="#{member.id}"></td>
+                                            </tr>
+                                            <tr>
+                                                <th th:text="#{bank31.table.thead.th.amount}"></th>
+                                                <td id="approvePopup_amount" th:text="#{member.id}">
+                                                    <input type="hidden" id="approve_amount"/>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <br>
+                                    * 출금 승인 버튼 클릭 시 출금이 완료됩니다.
+                                </div>                          
+                            </dl>
+                        </div>
+                        <p class="popButton">
+                            <a href="javascript: toApprove();" class="popConfirm" th:text="#{bank2.mod.popup.title}"></a>
+                            <a href="javascript:;" class="popCancel" th:text="#{cancel.btn}"></a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- //승인 팝업 -->
+    <!-- 거래소 출금 팝업 -->
+    <div class="popupArea" id="exchangePopup" >
+        <div class="dim"></div>
+        <div class="popupLayer">
+            <div class="popup">
+                <div class="box pop530">
+                    <form action="ajax/bank31/add" method="post" name="insert_mem18_form" id="insert_mem18_form">
+                        <div class="popCont">
+                            <!-- 상담이력 등록 및 할인 -->
+                            <dl class="dw_regist">
+                                <dt th:text="'거래소 출금 '"></dt>
+                                <div class="tableStyle2 bankInfo mb20">
+                                    <table>
+                                        <colgroup>
+                                            <col style="width: 30%;" />
+                                            <col style="width: 70%;" />
+                                        </colgroup>
+                                        <tbody>
+                                            <tr>
+                                                <th th:text="#{bank31.content2.table.withdraw.request_address}"></th>
+                                                <td><span class="typeText"><input id="withdrwa_request_address" type="text"/></span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <br>
+                                    * 거래소 출금 클릭 시 거래소 내 지갑으로 관리자가 수동으로 지급해야 하며, 관리자 페이지에서 암호화폐가 지급되지 않습니다.
+                                    <br>
+                                    * 거래소 출금 완료 후 반드시 출금 정보를 입력 후 출금 완료 버튼을 클릭하세요.
+                                </div>                          
+                            </dl>
+                        </div>
+                        <p class="popButton">
+                            <a href="javascript: toExchange();" class="popConfirm" th:text="#{bank2.mod.popup.title}"></a>
+                            <a href="javascript:;" class="popCancel" th:text="#{cancel.btn}"></a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- //거래소 출금 팝업 -->
+    <!-- 거절 팝업 -->
+    <div class="popupArea" id="rejectPopup" >
+        <div class="dim"></div>
+        <div class="popupLayer">
+            <div class="popup">
+                <div class="box pop530">
+                    <form action="ajax/bank31/add" method="post" name="insert_mem18_form" id="insert_mem18_form">
+                        <div class="popCont">
+                            <!-- 상담이력 등록 및 할인 -->
+                            <dl class="dw_regist">
+                                <dt th:text="'거절'"></dt>
+                                <div class="tableStyle2 bankInfo mb20">
+                                    <table>
+                                        <colgroup>
+                                            <col style="width: 30%;" />
+                                            <col style="width: 70%;" />
+                                        </colgroup>
+                                        <tbody>
+                                            <tr>
+                                                <th th:text="#{bank31.content2.reject.reason}"></th>
+                                                <td><span class="typeText"><input id="reject_reason" type="text"/></span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>                          
+                            </dl>
+                        </div>
+                        <p class="popButton">
+                            <a href="javascript: toReject();" class="popConfirm" th:text="#{bank31.content2.approve.reject}"></a>
+                            <a href="javascript:;" class="popCancel" th:text="#{cancel.btn}"></a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- //거절 팝업 -->
+
+
+    <!-- 일괄 거래소 출금 팝업 -->
+    <div class="popupArea" id="allExchangePopup" >
+        <div class="dim"></div>
+        <div class="popupLayer">
+            <div class="popup">
+                <div class="box pop530">
+                    <form action="ajax/bank31/add" method="post" name="insert_mem18_form" id="insert_mem18_form">
+                        <div class="popCont">
+                            <!-- 상담이력 등록 및 할인 -->
+                            <dl class="dw_regist">
+                                <dt th:text="'거래소 출금 '"></dt>
+                                <div class="tableStyle2 bankInfo mb20">
+                                    <table>
+                                        <colgroup>
+                                            <col style="width: 30%;" />
+                                            <col style="width: 70%;" />
+                                        </colgroup>
+                                        <tbody>
+                                            <tr>
+                                                <th th:text="#{bank31.content2.table.withdraw.request_address}"></th>
+                                                <td><span class="typeText"><input id="withdrwa_request_address_all" type="text"/></span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <br>
+                                    * 거래소 출금 클릭 시 거래소 내 지갑으로 관리자가 수동으로 지급해야 하며, 관리자 페이지에서 암호화폐가 지급되지 않습니다.
+                                    <br>
+                                    * 거래소 출금 완료 후 반드시 출금 정보를 입력 후 출금 완료 버튼을 클릭하세요.
+                                </div>                          
+                            </dl>
+                        </div>
+                        <p class="popButton">
+                            <a th:href="|javascript:toAllExchange('${searchValue}', '${member_proc.id}');|" class="popConfirm" th:text="#{bank2.mod.popup.title}"></a>
+                            <a href="javascript:;" class="popCancel" th:text="#{cancel.btn}"></a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- //일괄 거래소 출금 팝업 -->
+    <!-- 일괄 출금 거절 팝업 -->
+    <div class="popupArea" id="allRejectPopup" >
+        <div class="dim"></div>
+        <div class="popupLayer">
+            <div class="popup">
+                <div class="box pop530">
+                    <form action="ajax/bank31/add" method="post" name="insert_mem18_form" id="insert_mem18_form">
+                        <div class="popCont">
+                            <!-- 상담이력 등록 및 할인 -->
+                            <dl class="dw_regist">
+                                <dt th:text="'거절'"></dt>
+                                <div class="tableStyle2 bankInfo mb20">
+                                    <table>
+                                        <colgroup>
+                                            <col style="width: 30%;" />
+                                            <col style="width: 70%;" />
+                                        </colgroup>
+                                        <tbody>
+                                            <tr>
+                                                <th th:text="#{bank31.content2.reject.reason}"></th>
+                                                <td><span class="typeText"><input id="reject_reason_all" type="text"/></span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>                          
+                            </dl>
+                        </div>
+                        <p class="popButton">
+                            <a th:href="|javascript:toAllReject('${searchValue}', '${all_amount}', '${all_fee}', '${member_proc.id}');|" class="popConfirm" th:text="#{bank31.content2.approve.reject}"></a>
+                            <a href="javascript:;" class="popCancel" th:text="#{cancel.btn}"></a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- //일괄 출금 거절 팝업 -->
+</th:block>
+
+<th:block layout:fragment="script">
+    <link rel="stylesheet" href="/css/datepicker.min.css"/>
+    <script type="text/javascript" src="/js/datepicker.min.js"></script>
+    <script type="text/javascript" src="/js/i18n/datepicker.ko.js"></script>
+    <script type="text/javascript" src="/js/i18n/datepicker.en.js"></script>
+    <script type="text/javascript" src="/js/include/menu_banking.js"></script>
+    <script type="text/javascript" src="/js/banking/bank31.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var coinlist = /*[[${response.coinList}]]*/ null;
+        var DATEPICKER_ALERT_1 = [[#{datepicker.alert.1}]];
+        var SENDMAIL_WITHDRAW = [[#{send.mail.withdraw}]];
+        var SENDMAILSUCCESS = [[#{send.mail.success}]];
+        var ALERT_EXCELDOWNLOAD_ERR_MSG_1 = [[#{alert.exceldownload.err.msg.1}]];
+     /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

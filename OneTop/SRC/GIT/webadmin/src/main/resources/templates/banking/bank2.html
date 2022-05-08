@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+<title th:text="#{bank2.title}"></title>
+<th:block layout:fragment="css"></th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+    <div th:replace="include/menu :: banking"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+    <th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+    <div class="contSection" th:if="${securityYN}=='Y'">
+        <form action="bank2" name="search_bank2_form" id="search_bank2_form" method="POST">
+            <input type="hidden" name="sortName" th:value="${sortName}"/>
+            <input type="hidden" name="sortOrderBy" th:value="${sortOrderBy}"/>
+            <input type="hidden" name="page" id="page" th:value="${page}" />
+            <input type="hidden" name="total" id="total" th:value="${response.counts.search}" />
+            <h2 class="tit_h2" th:text="#{bank2.h2}"></h2>
+            <div class="tableStyle2 bankInfo mb20">
+                <table>
+                    <colgroup>
+                        <col style="width: 17%;" />
+                        <col style="width: 33%;" />
+                        <col style="width: 17%" />
+                        <col style="width: 33%" />
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th th:text="#{member.id}"></th>
+                        <td><span class="typeText"><input name="mb_id" type="text" th:placeholder="#{member.id}" th:value="${mb_id}"/></span></td>
+                        <th th:text="#{request.date} + ' *'"> *</th>
+                        <td>
+                            <p class="dateChoice">
+                                 <span>
+                                    <img src="/images/calendar_icon.png"/>
+                                    <input id="req_dt" name="req_dt" type="text" class="datepicker-here"
+                                           data-range="true"
+                                           data-multiple-dates-separator=" - "
+                                           th:data-language="${#locale}"
+                                           placeholder="YYYY.MM.DD - YYYY.MM.DD"
+                                           th:value="${req_dt != null} ? ${req_dt} : ''"
+                                    />
+                                </span>
+                            </p>
+                            <a href="javascript: setDateChoiceChange(1);"  class="dateSelectBtn" th:text="#{date.select.btn.1}"></a>
+                            <a href="javascript: setDateChoiceChange(2);"  class="dateSelectBtn" th:text="#{date.select.btn.2}"></a>
+                            <a href="javascript: setDateChoiceChange(3);"  class="dateSelectBtn" th:text="#{date.select.btn.3}"></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{coin} + ' *'"></th>
+                        <td class="sortTable">
+                            <span class="typeSelect">
+                                <select name="coin_name">
+                                    <option th:text="#{all}" value="ALL" th:selected="${coin_name}=='ALL' ? 'true' : 'false'"></option>
+                                    <th:block th:if="${#lists.size(response.coinList)} > 0" th:each="coin : ${response.coinList}">
+                                        <option th:attr="value=${coin.coin_name}" th:selected="(${coin_name}==${coin.coin_name}) ? 'true' : 'false'" th:text="${coin.coin_name}"></option>
+                                    </th:block>
+                                </select>
+                            </span>
+                        </td>
+                        <th th:text="#{status} + ' *'"></th>
+                        <td>
+                            <span class="typeSelect">
+                                <select name="status">
+                                    <option th:text="#{all}" value="ALL" th:selected="${status} or ${status} == 'ALL' ? 'true' : 'false'"></option>
+                                    <option th:text="#{email.authentication}" value="WAIT" th:selected="${status} == 'WAIT' ? 'true' : 'false'"></option>
+                                    <option th:text="#{bank2.table.thead.th.status.REQ}" value="REQ" th:selected="${status} == 'REQ' ? 'true' : 'false'"></option>
+                                    <option th:text="#{bank2.table.thead.th.status.ING}" value="ING" th:selected="${status} == 'ING' ? 'true' : 'false'"></option>
+                                    <option th:text="#{status.complete}" value="OK" th:selected="${status} == 'OK' ? 'true' : 'false'"></option>
+                                    <option th:text="#{rejected}" value="REJECT" th:selected="${status} == 'REJECT' ? 'true' : 'false'"></option>
+                                    <option th:text="#{bank2.table.thead.th.status.HOLD}" value="HOLD" th:selected="${status} == 'HOLD' ? 'true' : 'false'"></option>
+                                    <option th:text="#{bank2.table.thead.th.status.CANCEL}" value="CANCEL" th:selected="${status} == 'CANCEL' ? 'true' : 'false'"></option>
+                                    <option th:text="#{bank2.table.thead.th.status.ERROR}" value="ERROR" th:selected="${status} == 'ERROR' ? 'true' : 'false'"></option>
+                                </select>
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{tx.id}"></th>
+                        <td>
+                            <span class="typeText"><input type="text" name="txid" th:placeholder="#{tx.id}" th:value="${txid}"/></span>
+                        </td>
+                        <th th:text="#{bank2.table.thead.th.od_request_address}"></th>
+                        <td>
+                            <span class="typeText"><input type="text" name="od_request_address" th:placeholder="#{bank2.table.thead.th.od_request_address}" th:value="${od_request_address}"/></span>
+                        </td>
+                    </tr>
+                    <!--
+                    <tr>
+                        <th th:text="#{mem1.wallet.destination}"></th>
+                        <td>
+                            <span class="typeText"><input type="text" name="withdraw_memo" th:placeholder="#{mem1.wallet.destination}" th:value="${withdraw_memo}" /></span>
+                        </td>
+                    </tr>
+                    -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="buttonRight mb50">
+                <a href="javascript:void(0);" class="btnType" id="search_bank2_btn" th:text="#{search.btn}"></a>
+            </div>
+            <div class="listCountWrap">
+                <h3 class="tit_h3" th:if="${#locale.toString()} == 'ko'" th:text="#{cnt.search} + ' ' + ${response.counts.search}  + #{cnt}"></h3>
+                <h3 class="tit_h3" th:if="${#locale.toString()} == 'en'" th:text="${response.counts.search} + ' ' + #{cnt.search}"></h3>
+                <span class="typeSelect">
+                    <select name="search_listCount" id="searchListCount">
+                        <option value="10" th:selected="${search_listCount == 10}">10</option>
+                        <option value="20" th:selected="${search_listCount == 20}">20</option>
+                        <option value="50" th:selected="${search_listCount == 50}">50</option>
+                        <option value="100" th:selected="${search_listCount == 100}">100</option>
+                    </select>
+                </span>
+            </div>
+            <div class="tableStyle bankInfo aCenter head2 font13 mb20 fitTable">
+                <table>
+                    <colgroup>
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th th:text="#{number}"></th>
+                        <th th:text="#{tx.id}"></th>
+                        <th th:text="#{member.id}"></th>
+                        <th th:text="#{security.authentication}"></th>
+                        <th th:text="#{coin}"></th>
+                        <th><p class="orderby" th:text="#{bank2.table.thead.th.amount}"> <button type="button">▼</button></p></th>
+                        <th th:text="#{bank2.table.thead.th.fee}"></th>
+                        <th th:text="#{amount.settlement.fee}"></th>
+                        <th th:text="#{bank2.table.thead.th.od_request_address}"></th>
+                        <!--<th th:text="#{mem1.wallet.destination}"></th>-->
+                        <th th:text="#{status}"></th>
+                        <th><p class="orderby"><span th:text="#{request.date}"></span> <button type="button" id="reg_dt" onclick="orderBy(this.id);" th:style="${sortName == 'reg_dt'} ? 'color:red;' : ''" th:text="${sortName == 'reg_dt' and sortOrderBy == 'ASC'} ? #{orderby.asc} : #{orderby.desc}"></button></p></th>
+                        <th style="min-width: 90px;"><p class="orderby"><span th:text="#{completion.date}"></span> <button type="button" id="confirm_dt" onclick="orderBy(this.id);" th:style="${sortName == 'confirm_dt'} ? 'color:red;' : ''" th:text="${sortName == 'confirm_dt' and sortOrderBy == 'ASC'} ? #{orderby.asc} : #{orderby.desc}"></button></p></th>
+                        <th th:text="#{bank2.table.thead.th.admin_id}"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    <tr th:if="${#lists.size(response.bankCoinRequestList)} > 0" th:each="bankCoinRequest, iter : ${response.bankCoinRequestList}" th:class="${bankCoinRequest.status == 'REQ'} ? 'bgRed' : (${bankCoinRequest.status == 'HOLD'} ? 'bgOrange' : '')">
+                        <td th:text="${bankCoinRequest.od_id}"></td>
+                        <td class="typeToolTip" th:if="${bankCoinRequest.txid} and ${bankCoinRequest.txid != ''}">
+                            <span class="txid" th:text="${bankCoinRequest.txid}"></span>
+                            <span class="tooltip"></span>
+                            <a th:href="'javascript:copyToClipboard(\'' + ${bankCoinRequest.txid} +'\', \'' + #{copied} + '\');'"  class="tableCopyBtn">copy</a>
+                            <!--<a th:href="'javascript:sendMailCoinRequest(\'' + ${bankCoinRequest.od_id} +'\', \'' + ${bankCoinRequest.mb_id} +'\');'"  class="tableCopyBtn" >mail</a>-->
+                        </td>
+                        <td class="typeToolTip" th:unless="${bankCoinRequest.txid} and ${bankCoinRequest.txid != ''}"></td>
+                        <td th:if="${member_proc.role != 1}"><a th:href="'javascript:show_member_detail(\'' + ${bankCoinRequest.mb_id} + '\')'" th:text="${bankCoinRequest.mb_id}"></a></td>
+                        <td th:unless="${member_proc.role != 1}"><span th:text="${bankCoinRequest.mb_id}"></span></td>
+                        <td th:text="${bankCoinRequest.cert_cnt} + '/5'"></td>
+                        <td th:text="${bankCoinRequest.coin_name}"></td>
+                        <td th:text="${#numbers.formatDecimal(bankCoinRequest.od_request_coin, 1, 'COMMA', 4, 'POINT')}"></td>
+                        <td th:text="${#numbers.formatDecimal(bankCoinRequest.od_request_fee, 1, 'COMMA', 4, 'POINT')}"></td>
+                        <td th:text="${#numbers.formatDecimal(bankCoinRequest.od_receipt_coin, 1, 'COMMA', 4, 'POINT')}"></td>
+                        <td class="typeToolTip">
+                            <span class="txid" th:id="'od_request_address_' + ${iter.index}" th:text="${bankCoinRequest.od_request_address}"></span>
+                            <span class="tooltip"></span>
+                            <a th:href="'javascript:copyToClipboard(\'' + ${bankCoinRequest.od_request_address} +'\', \'' + #{copied} + '\');'"  class="tableCopyBtn">copy</a>
+                        </td>
+                        <!--<td th:text="${bankCoinRequest.withdraw_memo}"></td>-->
+                        <td >
+                            <a th:if="${member_proc.role != 1 || member_proc.role != 4}" th:href="'javascript:show_bank_detail(\'' + ${bankCoinRequest.od_id} + '\', \'' + ${bankCoinRequest.mb_id} + '\');'" th:text="#{'bank2.table.thead.th.status.' + ${bankCoinRequest.status}}"></a>
+                            <span th:if="${member_proc.role == 1 || member_proc.role == 4}" th:text="#{'bank2.table.thead.th.status.' + ${bankCoinRequest.status}}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${#dates.format(bankCoinRequest.reg_dt, 'yyyy-MM-dd HH:mm:ss')}"></span><br/>
+                            <span th:text="${bankCoinRequest.KST_reg_dt} ? '(' + ${#dates.format(bankCoinRequest.KST_reg_dt, 'yyyy-MM-dd HH:mm:ss')} + ')' : ''"></span>
+                        </td>
+                        <td>
+                            <span th:text="${#dates.format(bankCoinRequest.confirm_dt, 'yyyy-MM-dd HH:mm:ss')}"></span><br/>
+                            <span th:text="${bankCoinRequest.KST_confirm_dt} ? '(' + ${#dates.format(bankCoinRequest.KST_confirm_dt, 'yyyy-MM-dd HH:mm:ss')} + ')' : ''"></span>
+                        </td>
+                        <td th:text="${bankCoinRequest.admin_id}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="buttonRight">
+                <a href="javascript:void(0);" id="bank2_excel_down_btn" class="btnType" th:text="#{excel.download.btn}">Excel D/L</a>
+            </div>
+            <div class="pageFoot mb50">
+                <!--<p class="footText mb15">[ 최종 동기화 : YYYY.MM.DD 23:59:00 ]</p>-->
+                <ul class="footList">
+                    <li th:text="#{footer.message.1}"></li>
+                </ul>
+            </div>
+            <div class="pageFoot inPaging">
+                <div class="paging">
+                    <a href="javascript: goPage('1', '#search_bank2_form');" class="prevBt"></a>
+                    <a th:if="${response.pageNaviResponse.isPrev == 1}" href="javascript: goPrePage('#search_bank2_form');" class="beforeBt"></a>
+                    <a th:if="${response.pageNaviResponse.isPrev != 1}" href="javascript:;" class="beforeBt"></a>
+                    <ul th:each="index: ${#numbers.sequence(response.pageNaviResponse.decadeFirst, response.pageNaviResponse.decadeLast)}">
+                        <li th:class="${response.pageNaviResponse.current_page == index ? 'on' : ''}"><a th:href="@{'javascript: goPage(' + ${index} + ', \'#search_bank2_form\');'}" th:text="${index}"></a></li>
+                    </ul>
+                    <a th:if="${response.pageNaviResponse.isNext == 1}" href="javascript: goNextPage('#search_bank2_form');" class="afterBt"></a>
+                    <a th:if="${response.pageNaviResponse.isNext != 1}" href="javascript:;" class="afterBt"></a>
+                    <a th:href="@{'javascript: goPage(' + ${response.pageNaviResponse.lastPage} + ', \'#search_bank2_form\');'}" href="javascript: goPage();" class="nextBt"></a>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!-- //contSection -->
+</div>
+<!-- //contents -->
+<th:block layout:fragment="side"></th:block>
+<th:block layout:fragment="script">
+    <link rel="stylesheet" href="/css/datepicker.min.css"/>
+    <script type="text/javascript" src="/js/datepicker.min.js"></script>
+    <script type="text/javascript" src="/js/i18n/datepicker.ko.js"></script>
+    <script type="text/javascript" src="/js/i18n/datepicker.en.js"></script>
+    <script type="text/javascript" src="/js/include/menu_banking.js"></script>
+    <script type="text/javascript" src="/js/banking/bank2.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var coinlist = /*[[${response.coinList}]]*/ null;
+        var DATEPICKER_ALERT_1 = [[#{datepicker.alert.1}]];
+        var SENDMAIL_WITHDRAW = [[#{send.mail.withdraw}]];
+        var SENDMAILSUCCESS = [[#{send.mail.success}]];
+        var ALERT_EXCELDOWNLOAD_ERR_MSG_1 = [[#{alert.exceldownload.err.msg.1}]];
+     /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

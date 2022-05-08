@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+    <title th:text="#{sys9.title}"></title>
+    <th:block layout:fragment="css"></th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+    <div th:replace="include/menu :: system"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+    <th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+    <div class="contSection" th:if="${securityYN}=='Y'">
+        <h2 class="tit_h2" th:text="#{sys9.h2}"></h2>
+        <p class="topButton" th:if="${mode} == 'modify'">
+            <a href="javascript:checkImport();" class="btnType" th:text="#{import.btn}"></a>
+        </p>
+        <p class="topButton" th:unless="${mode} == 'modify'">
+            <a href="javascript:checkModify()" class="btnType" th:if="${member_proc.role == 0}" th:text="#{modify.btn}"></a>
+        </p>
+
+        <div class="tableStyle aCenter inputArea mb20">
+            <table>
+                <colgroup>
+                    <col style="width: 10%;" />
+                    <col style="width: 12%;" />
+                    <col style="width: 15%;" />
+                    <col style="width: 15%;" />
+                    <col style="width: 15%;" />
+                    <col style="width: 15%;" />
+                    <col style="width: 15%;" />
+                </colgroup>
+                <thead>
+                <tr>
+                    <th th:text="#{coin.code}"></th>
+                    <th th:text="#{coin.unit}"></th>
+                    <th th:text="#{deposit}"></th>
+                    <th th:text="#{withdrawal}"></th>
+                    <th th:text="#{list}"></th>
+                    <th th:text="#{invest}"></th>
+                    <th th:text="#{recovery}"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.size(bankingUse)} > 0" th:each="use, iter : ${bankingUse}">
+                    <td th:id="${'coin_no_' + iter.index}" th:text="${use.coin_no}"></td>
+                    <td th:id="${'coin_name_' + iter.index}" th:text="${use.coin_name}"></td>
+                    <td>
+                        <div class="systemBox3"  th:if="${mode} == 'modify'">
+                            <span class="typeSelect">
+                                <select th:id="${'banking_deposit_use_' + iter.index}">
+                                    <option th:selected="${use.banking_deposit_use == 'ON'} ? 'true' : 'false'" th:text="#{sys9.option.on}"></option>
+                                    <option th:selected="${use.banking_deposit_use == 'OFF'} ? 'true' : 'false'" th:text="#{sys9.option.off}"></option>
+                                </select>
+                            </span>
+                        </div>
+                        <div class="systemBox3"  th:unless="${mode} == 'modify'">
+                            <span th:if="${use.banking_deposit_use == 'ON'}" class="typeText" th:text="#{sys9.option.on}" style="color: green;"></span>
+                            <span th:unless="${use.banking_deposit_use == 'ON'}" class="typeText" th:text="#{sys9.option.off}" style="color: red;"></span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="systemBox3"  th:if="${mode} == 'modify'">
+                            <span class="typeSelect">
+                                <select th:id="${'banking_withdraw_use_' + iter.index}">
+                                    <option th:selected="${use.banking_withdraw_use == 'ON'} ? 'true' : 'false'" th:text="#{sys9.option.on}"></option>
+                                    <option th:selected="${use.banking_withdraw_use == 'OFF'} ? 'true' : 'false'" th:text="#{sys9.option.off}"></option>
+                                </select>
+                            </span>
+                        </div>
+                        <div class="systemBox3"  th:unless="${mode} == 'modify'">
+                            <span th:if="${use.banking_withdraw_use == 'ON'}" class="typeText" th:text="#{sys9.option.on}" style="color: green;"></span>
+                            <span th:unless="${use.banking_withdraw_use == 'ON'}" class="typeText" th:text="#{sys9.option.off}" style="color: red;"></span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="systemBox3"  th:if="${mode} == 'modify'">
+                            <span class="typeSelect">
+                                <select th:id="${'banking_list_use_' + iter.index}">
+                                    <option th:selected="${use.banking_list_use == 'ON'} ? 'true' : 'false'" th:text="#{sys9.option.on}"></option>
+                                    <option th:selected="${use.banking_list_use == 'OFF'} ? 'true' : 'false'" th:text="#{sys9.option.off}"></option>
+                                </select>
+                            </span>
+                        </div>
+                        <div class="systemBox3"  th:unless="${mode} == 'modify'">
+                            <span th:if="${use.banking_list_use == 'ON'}" class="typeText" th:text="#{sys9.option.on}" style="color: green;"></span>
+                            <span th:unless="${use.banking_list_use == 'ON'}" class="typeText" th:text="#{sys9.option.off}" style="color: red;"></span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="systemBox3"  th:if="${mode} == 'modify'">
+                            <span class="typeSelect">
+                                <select th:id="${'banking_invest_use_' + iter.index}">
+                                    <option th:selected="${use.banking_invest_use == 'ON'} ? 'true' : 'false'" th:text="#{sys9.option.on}"></option>
+                                    <option th:selected="${use.banking_invest_use == 'OFF'} ? 'true' : 'false'" th:text="#{sys9.option.off}"></option>
+                                </select>
+                            </span>
+                        </div>
+                        <div class="systemBox3"  th:unless="${mode} == 'modify'">
+                            <span th:if="${use.banking_invest_use == 'ON'}" class="typeText" th:text="#{sys9.option.on}" style="color: green;"></span>
+                            <span th:unless="${use.banking_invest_use == 'ON'}" class="typeText" th:text="#{sys9.option.off}" style="color: red;"></span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="systemBox3"  th:if="${mode} == 'modify'">
+                            <span class="typeSelect">
+                                <select th:id="${'banking_recovery_use_' + iter.index}">
+                                    <option th:selected="${use.banking_recovery_use == 'ON'} ? 'true' : 'false'" th:text="#{sys9.option.on}"></option>
+                                    <option th:selected="${use.banking_recovery_use == 'OFF'} ? 'true' : 'false'" th:text="#{sys9.option.off}"></option>
+                                </select>
+                            </span>
+                        </div>
+                        <div class="systemBox3"  th:unless="${mode} == 'modify'">
+                            <span th:if="${use.banking_recovery_use == 'ON'}" class="typeText" th:text="#{sys9.option.on}" style="color: green;"></span>
+                            <span th:unless="${use.banking_recovery_use == 'ON'}" class="typeText" th:text="#{sys9.option.off}" style="color: red;"></span>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="buttonRight" th:if="${mode} == 'modify'">
+            <a href="sys9" class="btnType" id="cancel" th:text="#{cancel.btn}"></a>
+        </div>
+    </div>
+    <!-- //contSection -->
+</div>
+
+<th:block layout:fragment="script">
+    <script type="text/javascript" src="/js/include/menu_system.js"></script>
+    <script type="text/javascript" src="/js/system/sys9.js"></script>
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var STR_Q_IMPORT = [[#{import.message}]];
+        var STR_Q_MODIFY = [[#{sys9.q.modify}]];
+        var STR_REQUEST_FAIL=[[#{import.requestfail}]];
+        var STR_REQUEST_SUCCESS=[[#{import.reuqestsuccess}]];
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

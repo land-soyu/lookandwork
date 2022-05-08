@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout_other">
+<head>
+    <title th:text="#{bank2.mod.title}"></title>
+    <th:block layout:fragment="css">
+
+    </th:block>
+</head>
+<body class="newWin">
+
+
+<div layout:fragment="content">
+    <th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+    <div class="contSection" th:if="${securityYN}=='Y'">
+            <h2 class="tit_h2"> <span th:text="#{bank2.mod.h2}"></span> <span class="rp"><a href="javascript:void(0);" th:text="#{show.member.qna.list}"></a></span> </h2>
+
+            <div class="tableStyle2 aCenter mb20">
+                <table>
+                    <colgroup>
+                        <col style="width: 12%;" />
+                        <col style="width: 4%;" />
+                        <col style="width: 8%;" />
+                        <col style="width: 8%;" />
+                        <col style="width: 15.2%;" />
+                        <col style="width: 15.2%;" />
+                        <col style="width: 15.2%;" />
+                        <col style="width: 15.2%;" />
+                        <col style="width: 15.2%;" />
+                    </colgroup>
+                    <tbody>
+                   <tr>
+                       <th th:text="#{tx.id}"></th>
+                       <td colspan="8" th:text="${bankCoinRequest.txid}"></td>
+                   </tr>
+                   <tr>
+                       <th th:text="#{bank2.table.thead.th.od_request_address}"></th>
+                       <td colspan="4" th:text="${bankCoinRequest.od_request_address}"></td>
+                       <th th:text="#{mem1.wallet.destination}"></th>
+                       <td colspan="4" th:text="${bankCoinRequest.withdraw_memo}"></td>
+                   </tr>
+                    <tr>
+                        <th th:text="#{member.id}"></th>
+                        <th th:text="#{security.authentication}"></th>
+                        <th th:text="#{channel}"></th>
+                        <th th:text="#{coin}"></th>
+                        <th th:text="#{bank2.table.thead.th.amount}"></th>
+                        <th th:text="#{bank2.table.thead.th.fee}"></th>
+                        <th th:text="#{amount.settlement.fee}"></th>
+                        <th th:text="#{request.date}"></th>
+                        <th th:text="#{bank2.mod.table.thead.th.hold_dt}"></th>
+                    </tr>
+                    <tr>
+                        <td th:text="${bankCoinRequest.mb_id}"></td>
+                        <td th:text="${bankCoinRequest.cert_cnt} + '/5'"></td>
+                        <td th:text="${bankCoinRequest.channel} ? ${bankCoinRequest.channel} : ''"></td>
+                        <td id="coin_name" th:text="${bankCoinRequest.coin_name}"></td>
+                        <td id="od_request_coin" th:text="${#numbers.formatDecimal(bankCoinRequest.od_request_coin, 1, 'COMMA', 4, 'POINT')}"></td>
+                        <td th:text="${#numbers.formatDecimal(bankCoinRequest.od_request_fee, 1, 'COMMA', 4, 'POINT')}"></td>
+                        <td th:text="${#numbers.formatDecimal(bankCoinRequest.od_receipt_coin, 1, 'COMMA', 4, 'POINT')}"></td>
+                        <td th:text="${#dates.format(bankCoinRequest.reg_dt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                        <td th:text="${bankCoinRequest.status == 'HOLD'} ? ${bankCoinRequest.admin_confirm_dt} : ''"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="tableStyle2 aCenter mb20">
+                <table>
+                    <colgroup>
+                        <col style="width: 8%;" />
+                        <col style="width: 92%;" />
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th>
+                            <span th:text="#{bank2.mod.table.thead.th.err_msg.1}"></span><br/>
+                            <span th:text="#{bank2.mod.table.thead.th.err_msg.2}"></span>
+                        </th>
+                        <td colspan="8">
+                            <div class="handBox fixed">
+                                <textarea disabled="true" th:text="${bankCoinRequest.error_message}"></textarea>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="tableStyle2 mb20">
+                <table>
+                    <colgroup>
+                        <col style="width: 8%;" />
+                        <col style="width: 42%;" />
+                        <col style="width: 8%;" />
+                        <col style="width: 42%;" />
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th th:text="#{complete}"></th>
+                        <td>
+                            <input type="radio" id="handling1" name="handling" value="OK" th:disabled="${bankCoinRequest.status != 'REQ' and bankCoinRequest.status != 'HOLD'} ? 'true' : 'false'" th:checked="${bankCoinRequest.status == 'OK' or bankCoinRequest.status == 'ING' or bankCoinRequest.status == 'ERROR'} ? 'true' : 'false'"><label for="handling1" th:text="#{approved}"></label>
+                            <input type="radio" id="handling2" name="handling" value="REJECT" th:disabled="${bankCoinRequest.status != 'REQ' and bankCoinRequest.status != 'HOLD' and bankCoinRequest.status != 'WAIT'}  ? 'true' : 'false'" th:checked="${bankCoinRequest.status == 'REJECT'}"><label for="handling2" th:text="#{rejected}"></label>
+<!--                            <input type="radio" id="handling3" name="handling" value="HOLD" th:disabled="${bankCoinRequest.status != 'REQ' and bankCoinRequest.status != 'HOLD'} ? 'true' : 'false'" th:checked="${bankCoinRequest.status == 'HOLD'}"><label for="handling3" th:text="#{bank2.table.thead.th.status.HOLD}"></label>-->
+                        </td>
+                        <th th:text="#{bank2.table.thead.th.admin_id}"></th>
+                        <td><p th:text="${member_proc.id}"></p></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{language}"></th>
+                        <td colspan="3">
+                            <span class="typeText" th:text="(${bankCoinRequest.mb_use_language} ? #{'language.' +  ${bankCoinRequest.mb_use_language}} : '-')"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank2.mod.table.thead.th.reject_reason}"></th>
+                        <td colspan="3">
+                            <form autocomplete="do-not-show-ac">
+                            <span class="typeText"><input type="text" id="reject_reason" name="reject_reason" th:placeholder="#{bank2.mod.table.thead.th.reject_reason}" th:disabled="${bankCoinRequest.status != 'REQ'  and bankCoinRequest.status != 'HOLD' and bankCoinRequest.status != 'WAIT'} ? 'true' : 'false'" th:value="${bankCoinRequest.status == 'HOLD' or bankCoinRequest.status == 'REJECT'} ? ${bankCoinRequest.reject} : ''" autocomplete="do-not-show-ac"/></span>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pageFoot mb50">
+                <div class="buttonRight" th:if="${bankCoinRequest.status != 'REQ' and bankCoinRequest.status != 'HOLD' and bankCoinRequest.status != 'WAIT'}">
+
+                    <a href="javascript:window.close();" class="btnType" th:text="#{close.btn}"></a>
+                </div>
+                <div class="buttonRight" th:unless="${bankCoinRequest.status != 'REQ' and bankCoinRequest.status != 'HOLD' and bankCoinRequest.status != 'WAIT'}">
+                    <a href="javascript:window.close();" class="btnType" th:text="#{cancel.btn}"></a>
+                    <a href="javascript:checkSave();" class="btnType" th:text="#{save.btn}"></a>
+                </div>
+            </div>
+
+
+            <h3 class="tit_h3"><span  th:text="#{bank2.mod.table.thead.th.change_history}"></span> <span class="rp"><a th:href="'javascript:show_member_balance_log(\'' + ${bankCoinRequest.mb_id} + '\')'" th:text="#{show.member.asset.history}"></a></span></h3>
+            <div class="tableStyle aCenter font13 mb50 fitTable">
+                <table>
+                    <colgroup>
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th th:text="#{number}"></th>
+                        <th th:text="#{type}"></th>
+                        <th th:text="#{coin.market}"></th>
+                        <th colspan="2" th:text="#{price}"></th>
+                        <th colspan="2" th:text="#{amount}"></th>
+                        <th colspan="2" th:text="#{mem5.table.thead.th.sign_balance}"></th>
+                        <th colspan="2" th:text="#{fee}"></th>
+                        <th colspan="2" th:text="#{mem5.table.thead.th.sign_adj_balance}"></th>
+                        <th colspan="2" th:text="#{mem5.table.thead.th.coin_asset}"></th>
+                        <th th:text="#{mem5.table.thead.th.change_date}"></th>
+                        <th th:text="#{remarks}"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.size(memberBalanceLogResponse.memberBalanceLogList)} > 0" th:each="memberBalanceLog, iter : ${memberBalanceLogResponse.memberBalanceLogList}">
+                        <td th:text="${memberBalanceLog.idx}"></td>
+                        <td th:text="#{${'mem5.table.thead.th.type.' + memberBalanceLog.action}}"></td>
+                        <td th:switch="${memberBalanceLog.action}">
+                            <div th:case="invest" th:text="${memberBalanceLog.market_name}"></div>
+							<div th:case="recovery" th:text="${memberBalanceLog.market_name}"></div>
+                            <div th:case="*" th:text="'-'"></div>
+                        </td>
+
+                        <td th:text="${#numbers.formatDecimal(memberBalanceLog.sign_price, 1, 'COMMA', 4, 'POINT')}"></td>
+                        <td th:switch="${memberBalanceLog.action}">
+                            <div th:case="bid" th:text="${#strings.arraySplit(memberBalanceLog.market_name, '/')[1]}"></div>
+                            <div th:case="ask" th:text="${#strings.arraySplit(memberBalanceLog.market_name, '/')[1]}"></div>
+                            <div th:case="*" th:text="'-'"></div>
+                        </td>
+                        <td th:text="${#numbers.formatDecimal(memberBalanceLog.sign_amount, 1, 'COMMA', 4, 'POINT')}"></td>
+                        <td th:switch="${memberBalanceLog.action}">
+                            <div th:case="invest" th:text="${memberBalanceLog.market_name}"></div>
+							<div th:case="recovery" th:text="${memberBalanceLog.coin_name}"></div>
+                            <div th:case="*" th:text="'-'"></div>
+                        </td>
+                        <td th:text="${#numbers.formatDecimal(memberBalanceLog.sign_balance, 1, 'COMMA', 4, 'POINT')}"></td>
+                        <td th:switch="${memberBalanceLog.action}">
+                            <div th:case="invest" th:text="${memberBalanceLog.coin_name}"></div>
+							<div th:case="recovery" th:text="${memberBalanceLog.market_name}"></div>
+                            <div th:case="*" th:text="${memberBalanceLog.coin_name}"></div>
+                        </td>
+                        <td th:text="${#numbers.formatDecimal(memberBalanceLog.fee, 1, 'COMMA', 4, 'POINT')}"></td>
+                        <td th:switch="${memberBalanceLog.action}">
+                            <div th:case="invest" th:text="${memberBalanceLog.coin_name}"></div>
+							<div th:case="recovery" th:text="${memberBalanceLog.market_name}"></div>
+                            <div th:case="*" th:text="${memberBalanceLog.coin_name}"></div>
+                        </td>
+                        <td th:text="${#numbers.formatDecimal(memberBalanceLog.adjust_balance, 1, 'COMMA', 4, 'POINT')}"></td>
+                        <td th:switch="${memberBalanceLog.action}">
+                            <div th:case="invest" th:text="${memberBalanceLog.coin_name}"></div>
+							<div th:case="recovery" th:text="${memberBalanceLog.market_name}"></div>
+                            <div th:case="*" th:text="${memberBalanceLog.coin_name}"></div>
+                        </td>
+                        <td th:text="${#numbers.formatDecimal(memberBalanceLog.coin_balance, 1, 'COMMA', 4, 'POINT')}"></td>
+                        <td th:switch="${memberBalanceLog.action}">
+                            <div th:case="invest" th:text="${memberBalanceLog.coin_name}"></div>
+							<div th:case="recovery" th:text="${memberBalanceLog.market_name}"></div>
+                            <div th:case="*" th:text="${memberBalanceLog.coin_name}"></div>
+                        </td>
+                        <td th:text="${memberBalanceLog.change_date}"></td>                        
+                        <td th:text="${memberBalanceLog.memo}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+            <h3 class="tit_h3" th:text="#{asset.infor}"></h3>
+            <div class="tableStyle handTable aCenter font13 mb20">
+                <table>
+                    <colgroup>
+                        <col style="width: 25%;" />
+                        <col style="width: 25%;" />                        
+                        <col style="width: 25%;" />
+                        <col style="width: 25%;" />
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th th:text="#{coin}"></th>
+                        <th th:text="#{bank2.mod.table.thead.th.coin_avail}"></th>                        
+                        <th th:text="#{bank2.mod.table.thead.th.coin_in_withdraw}"></th>
+                        <th th:text="#{sum}"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.size(memberBalanceInfo)} > 0" th:each="balanceInfo : ${memberBalanceInfo}" >
+					    <th th:text="${balanceInfo.coin_name}"></th>
+					    <td th:text="${#numbers.formatDecimal(balanceInfo.avail, 1, 'COMMA', 4, 'POINT')}"></td>					
+					    <td th:text="${#numbers.formatDecimal(balanceInfo.in_withdraw, 1, 'COMMA', 4, 'POINT')}"></td>
+					    <td th:text="${#numbers.formatDecimal(balanceInfo.avail+balanceInfo.in_withdraw, 1, 'COMMA', 4, 'POINT')}"></td>
+				</tr>
+                    <!--
+                    <tr>
+                        <th class="all" th:text="#{bank2.mod.table.thead.th.exc_coin_total}"></th>
+                        <td th:text="${#numbers.formatDecimal(memberBalanceInfoTotal.exc_avail, 1, 'COMMA', 4, 'POINT')}"></td>
+                        <td th:text="${#numbers.formatDecimal(memberBalanceInfoTotal.exc_in_use, 1, 'COMMA', 4, 'POINT')}"></td>
+                        <td th:text="${#numbers.formatDecimal(memberBalanceInfoTotal.exc_in_withdraw, 1, 'COMMA', 4, 'POINT')}"></td>
+                        <td th:text="${#numbers.formatDecimal(memberBalanceInfoTotal.exc_total, 1, 'COMMA', 4, 'POINT')}"></td>
+                    </tr>-->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pageFoot mb50">
+                <ul class="footList">
+                    <li th:text="#{footer.message.1}"></li>
+                </ul>
+            </div>
+
+        </div>
+        <!-- //contSection -->
+</div>
+
+<!-- //contents -->
+<th:block layout:fragment="side">
+    <!-- 출금 승인 -->
+    <!-- //////////////////////////
+
+        >> 개발시 컨트롤은 id="withdrawalPopup" 로 작업하세요.
+
+    ////////////////////////// -->
+    <div class="popupArea" id="withdrawalPopup" style="display: none;">
+        <div class="dim"></div>
+        <div class="popupLayer">
+            <div class="popup">
+                <div class="box pop340">
+                    <p class="popTit" th:text="#{bank2.mod.popup.title}"></p>
+                    <div class="popCont">
+                        <!-- 출금 승인 -->
+                        <div class="withdrawalBox">
+                            <input type="hidden" id="od_id" th:value="${bankCoinRequest.od_id}" />
+                            <input type="hidden" name="modulus" id="modulus" th:value="${modulus}">
+                            <input type="hidden" name="exponent" id="exponent" th:value="${exponent}">
+                            <ul>
+                                <li><span th:text="#{member.id}"></span> : <span th:text="${bankCoinRequest.mb_id}"></span></li>
+                                <li><span th:text="#{bank2.table.thead.th.amount}"></span> : <span th:text="${#numbers.formatDecimal(bankCoinRequest.od_request_coin, 1, 'COMMA', 4, 'POINT')} + ' ' + ${bankCoinRequest.coin_name}"></span></li>
+                            </ul>
+                            <dl>
+                                <!--<dt th:text="#{bank2.mod.popup.otp_pw}"></dt>
+                                <dd><span class="typeText"><input type="password" id="otp_pw" th:placeholder="#{bank2.mod.popup.otp_pw}"></span></dd> -->
+
+                                <dt th:text="#{bank2.mod.popup.admin_pw}"></dt>
+                                <dd><span class="typeText"><input type="password" id="admin_pw" th:placeholder="#{bank2.mod.popup.admin_pw}"></span></dd>
+
+                                <!--<dt th:text="#{bank2.mod.popup.withdraw_pw}"></dt>
+                                <dd><span class="typeText"><input type="password" id="withdraw_pw" th:placeholder="#{bank2.mod.popup.withdraw_pw}"></span></dd>-->
+                            </dl>
+                        </div>
+                        <!-- //출금 승인 -->
+                    </div>
+                    <p class="popButton">
+                        <a href="javascript:confirm_withdraw();" class="popConfirm" th:text="#{approved}"></a>
+                        <a href="javascript:document.getElementById('withdrawalPopup').style.display = 'none';" class="popCancel" th:text="#{cancel.btn}"></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- //출금 승인 -->
+</th:block>
+
+</th:block>
+<th:block layout:fragment="script">
+    <script type="text/javascript" src="/js/rsa/rsa.js"></script>
+    <script type="text/javascript" src="/js/rsa/jsbn.js"></script>
+    <script type="text/javascript" src="/js/rsa/prng4.js"></script>
+    <script type="text/javascript" src="/js/rsa/rng.js"></script>
+    <script type="text/javascript" src="/js/banking/bank2_mod.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var STR_Q_PROCESS_REJECT = [[#{bank2.mod.process.reject}]];
+        var STR_Q_PROCESS_HOLD = [[#{bank2.mod.process.hold}]];
+        var STR_Q_PROCESS_CONFIRM = [[#{bank2.mod.process.confirm}]];
+        var STR_REQUEST_FAIL = [[#{import.requestfail}]];
+        var STR_REQUEST_SUCCESS = [[#{import.reuqestsuccess}]];
+        var STR_FIELD_IS_EMPTY = [[#{bank2.mod.popup.field_is_empty}]];
+        var STR_FIELD_IS_EMPTY2 = [[#{bank2.mod.popup.field_is_empty2}]];
+        var STR_FIELD_IS_EMPTY3 = [[#{bank2.mod.popup.field_is_empty3}]];
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

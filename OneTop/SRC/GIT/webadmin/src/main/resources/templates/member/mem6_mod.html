@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+<title th:text="#{mem6.mod.title}"></title>
+<th:block layout:fragment="css"></th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+    <div th:replace="include/menu :: member"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+    <th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+    <div class="contSection" th:if="${securityYN}=='Y'">
+        <h2 class="tit_h2" th:text="#{mem6.mod.h2}"></h2>
+        <form action="mem6_mod" name="search_payment_repayment_member_info_form" id="search_payment_repayment_member_info_form" method="get">
+            <input type="hidden" name="no" th:value="${paymentRepayment.no}" />
+            <input type="hidden" name="page" id="page" th:value="${page}" />
+            <input type="hidden" name="reg_dt" th:value="${#dates.format(paymentRepayment.reg_dt, 'yyyy.MM.dd')}" />
+            <div class="tableStyle2 memInfo mb20">
+                <table>
+                    <colgroup>
+                        <col style="width: 17%;" />
+                        <col style="width: 33%;" />
+                        <col style="width: 17%" />
+                        <col style="width: 33%" />
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th th:text="#{request.number}"></th>
+                        <td th:text="${paymentRepayment.no}"></td>
+                        <th th:text="#{request.date}"></th>
+                        <td th:text="${#dates.format(paymentRepayment.reg_dt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{mem6.mod.table.th.request_info}"></th>
+                        <td>
+                            (
+                            <span th:if="${paymentRepayment.content_type == 0}" th:text="#{cost}"></span>
+                            <span th:if="${paymentRepayment.content_type == 1}" th:text="#{sales}"></span>
+                            <span th:if="${paymentRepayment.content_type == 2}" th:text="#{etc}"></span>
+                            <span th:if="${paymentRepayment.content_type == 3}" th:text="#{mem6.table.th.type.3}"></span>
+                            )
+                            &nbsp;
+                            <span th:text="${paymentRepayment.content}"></span>
+                            <br/>
+                            <span th:text="${paymentRepayment.coin_quantity}"></span>
+                            &nbsp;
+                            <span th:text="${paymentRepayment.coin_name}"></span>
+                            &nbsp;
+                            <span th:text="${paymentRepayment.pr_type} == 0 ? #{payments} : #{recovery}"></span>
+                        </td>
+                        <th th:text="#{admin.id}"></th>
+                        <td th:text="${paymentRepayment.admin_id}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{mem6.mod.table.th.complete_count}"></th>
+                        <td colspan="3" th:text="${paymentRepayment.complete_count} + '/' + ${paymentRepayment.total_count}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </form>
+        <h3 class="tit_h3" th:text="#{mem6.mod.table.th.info}"></h3>
+        <div class="tableStyle memInfo aCenter font13 mb20">
+            <table>
+                <colgroup>
+                    <col width="15%"/>
+                    <col width="15%"/>
+                    <col width="70%"/>
+                </colgroup>
+                <thead>
+                <tr>
+                    <th th:text="#{mem6.table.th.id}"></th>
+                    <th th:text="#{status}"></th>
+                    <th th:text="#{mem6.mod.table.th.content}"></th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="paymentRepaymentMemberInfo : ${paymentRepaymentMemberInfoResponse.paymentRepaymentMemberInfoList}">
+                        <td th:if="${member_proc.role != 1}"><a th:href="'javascript:show_member_detail(\'' + ${paymentRepaymentMemberInfo.mb_id} + '\')'" th:text="${paymentRepaymentMemberInfo.mb_id}"></a></td>
+                        <td th:unless="${member_proc.role != 1}"><span th:text="${paymentRepaymentMemberInfo.mb_id}"></span></td>
+                        <td>
+                            <span th:if="${paymentRepaymentMemberInfo.state == 'REQ'}" th:text="#{waiting}"></span>
+                            <span th:if="${paymentRepaymentMemberInfo.state == 'OK'}" th:text="#{status.complete}"></span>
+                            <span th:if="${paymentRepaymentMemberInfo.state == 'ERR'}" th:text="#{mem6.mod.state.err}"></span>
+                        </td>
+                        <td th:text="${paymentRepaymentMemberInfo.content}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="buttonRight">
+            <a href="javascript:;" class="btnType" id="mem6_mod_excel_down_btn" th:text="#{excel.download.btn}"></a>
+        </div>
+        <div class="pageFoot mb50">
+            <p class="footText mb15" th:text="${adminPaymentRepaymentMemberInfoSyncDate} ? ('[ ' + #{last.confirm.date} + ${#dates.format(adminPaymentRepaymentMemberInfoSyncDate, 'yyyy-MM-dd HH:mm:ss')} + ' ]') : ''"></p>
+            <ul class="footList">
+                <li th:text="#{mem6.footer.message1}"></li>
+            </ul>
+        </div>
+        <div class="pageFoot inPaging">
+            <div class="paging">
+                <a href="javascript: goPage('1', '#search_payment_repayment_member_info_form');" class="prevBt"></a>
+                <a th:if="${paymentRepaymentMemberInfoResponse.pageNaviResponse.isPrev == 1}" href="javascript: goPrePage('#search_payment_repayment_member_info_form');" class="beforeBt"></a>
+                <a th:if="${paymentRepaymentMemberInfoResponse.pageNaviResponse.isPrev != 1}" href="javascript:;" class="beforeBt"></a>
+                <ul th:each="index: ${#numbers.sequence(paymentRepaymentMemberInfoResponse.pageNaviResponse.decadeFirst, paymentRepaymentMemberInfoResponse.pageNaviResponse.decadeLast)}">
+                    <li th:class="${paymentRepaymentMemberInfoResponse.pageNaviResponse.current_page == index ? 'on' : ''}"><a th:href="@{'javascript: goPage(' + ${index} + ', \'#search_payment_repayment_member_info_form\');'}" th:text="${index}"></a></li>
+                </ul>
+                <a th:if="${paymentRepaymentMemberInfoResponse.pageNaviResponse.isNext == 1}" href="javascript: goNextPage('#search_payment_repayment_member_info_form');" class="afterBt"></a>
+                <a th:if="${paymentRepaymentMemberInfoResponse.pageNaviResponse.isNext != 1}" href="javascript:;" class="af
+                terBt"></a>
+                <a th:href="@{'javascript: goPage(' + ${paymentRepaymentMemberInfoResponse.pageNaviResponse.lastPage} + ', \'#search_payment_repayment_member_info_form\');'}" href="javascript: goPage();" class="nextBt"></a>
+            </div>
+        </div>
+    </div>
+    <!-- //contSection -->
+</div>
+<!-- //contents -->
+<th:block layout:fragment="side"></th:block>
+<th:block layout:fragment="script">
+    <script type="text/javascript" src="/js/include/menu_member.js"></script>
+    <script type="text/javascript" src="/js/member/mem6_mod.js"></script>
+</th:block>
+</body>
+</html>

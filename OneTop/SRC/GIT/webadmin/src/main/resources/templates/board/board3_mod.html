@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout_mod">
+<head>
+<title th:text="#{board3.mod.title}"></title>
+<th:block layout:fragment="css"></th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+    <div th:replace="include/menu :: board"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+    <th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+    <div class="contSection" th:if="${securityYN}=='Y'">
+        <h2 class="tit_h2" th:text="#{board3.h2}"></h2>
+        <div class="tableStyle2 boardStyle mb60">
+            <table>
+                <colgroup>
+                    <col style="width: 17%;" />
+                    <col style="width: 33%;" />
+                    <col style="width: 17%;" />
+                    <col style="width: 33%;" />
+                </colgroup>
+                <tbody>
+                    <tr>                        
+                        <th th:text="#{registration.date}"></th>
+                        <td>
+                            <p th:text="${#dates.format(qna.reg_dt, 'yyyy-MM-dd HH:mm:ss')}"></p>
+                        </td>
+                        <th th:text="#{board3.table.th.id}"></th>
+                        <td>
+                            <p th:text="${qna.member_id}"></p>
+                        </td>                        
+                    </tr>                    
+                    <tr>
+                        <th th:text="#{title}"></th>
+                        <td>
+                            <p th:text="${qna.title}"></p>
+                        </td>    
+                        <td class="boardQuestion" colspan="4">
+                            <div th:utext="${#strings.replace(qna.content, '<pre>', '')}"></div>
+                        </td>                    
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:each="qnaComment : ${qnaCommentList}">
+            <p class="qnAnswerTitle"><span th:text="#{board3.answer} + ' : ' + ${qnaComment.admin_id}"></span> <span th:text="#{board3.mod.state.reg_dt} + ' : ' + ${#dates.format(qnaComment.reg_dt, 'yyyy-MM-dd HH:mm:ss')}"></span></p>
+            <div class="qnAnswerCont mb20" th:utext="${#strings.replace(qnaComment.content, image_addr, '/attachments/images')}"></div>
+        </div>
+        <form action="javascript:;" method="post" name="qnaCommentForm" id="qnaCommentForm">
+            <input type="hidden" name="no" id="no" th:value="${qna.no}" />
+            <input type="hidden" name="mbId" th:value="${qna.member_id}" />
+            <input type="hidden" name="pageUrl" id="pageUrl" value="qna-comment" />
+            <input type="hidden" name="title" th:value="${qna.title}" />
+            <input type="hidden" name="contents" th:value="${qna.content}" />
+            <input type="hidden" name="regDt" th:value="${qna.reg_dt}" />
+            <!--<input type="hidden" name="qnaType" th:value="${qna.qna_type}" />-->
+            <textarea id="summernote" name="comment"></textarea>
+        </form>
+        <div class="buttonRight">
+            <a href="board3" class="btnType" th:text="#{cancel.btn}"></a>
+            <a href="javascript: saveQnaComment();" class="btnType" th:text="#{save.btn}"></a>
+        </div>
+    </div>
+    <!-- //contSection -->
+</div>
+<!-- //contents -->
+<th:block layout:fragment="side"></th:block>
+<th:block layout:fragment="script">
+<script type="text/javascript" src="/js/include/menu_board.js"></script>
+<script type="text/javascript" src="/js/board/board3_mod.js"></script>
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+
+    var IMAGE_ADDR = [[${image_addr}]];
+
+    /* 알림창 메세지 가져오기 */
+    function getMessage(index) {
+
+        var message = '';
+
+        switch (index) {
+            case 1:
+                message = [[#{enter.content}]];
+                break;
+            case 2:
+                message = [[#{save.message}]];
+                break;
+            case 3:
+                message = [[#{image.upload}]];
+                break;
+            default:
+                break;
+        }
+
+        return message;
+    }
+    /*]]>*/
+</script>
+</th:block>
+</body>
+</html>

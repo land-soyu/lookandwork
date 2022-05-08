@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+<title th:text="#{sys6.title}"></title>
+<th:block layout:fragment="css">
+<link rel="stylesheet" href="/css/datepicker.min.css"/>
+</th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+    <div th:replace="include/menu :: system"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+    <th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+    <div class="contSection" th:if="${securityYN}=='Y'">
+        <h2 class="tit_h2" th:text="#{sys6.h2}"></h2>
+        <form action="sys6" method="get" name="search_log_form" id="search_log_form">
+            <input type="hidden" name="page" id="page" th:value="${page}" />
+            <input type="hidden" name="total" id="total" th:value="${systemLogResponse.total_adminLog_count}">
+            <div class="tableStyle2 systemLog mb20">
+                <table>
+                    <colgroup>
+                        <col style="width: 17%;" />
+                        <col style="width: 33%;" />
+                        <col style="width: 17%" />
+                        <col style="width: 33%" />
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th th:text="#{type} + ' *'"></th>
+                        <td>
+                            <span class="typeSelect">
+                                <select name="search_type" id="search_type">
+                                    <option value="all" th:selected="${search_type == 'all'}" th:text="#{all}"></option>
+                                    <option value="211" th:selected="${search_type == '211'}" th:text="#{trade.fee}"></option>
+                                    <option value="221" th:selected="${search_type == '221'}" th:text="#{sys6.type.221}"></option>
+                                    <option value="231" th:selected="${search_type == '231'}" th:text="#{sys6.type.231}"></option>
+                                    <option value="232" th:selected="${search_type == '232'}" th:text="#{sys6.type.232}"></option>
+                                    <option value="241" th:selected="${search_type == '241'}" th:text="#{sys6.type.241}"></option>
+                                </select>
+                            </span>
+                        </td>
+                        <th th:text="#{sys6.table.th.reg_dt} + ' *'"></th>
+                        <td>
+                            <p class="dateChoice">
+                                <span>
+                                    <img src="/images/calendar_icon.png" alt="날짜선택" />
+                                    <input id="search_reg_dt" name="search_reg_dt" type="text" class="datepicker-here" data-range="true" data-multiple-dates-separator=" - " th:data-language="${#locale}" placeholder="YYYY.MM.DD - YYYY.MM.DD" th:value="${search_reg_dt != null} ? ${search_reg_dt} : ''" />
+                                </span>
+                            </p>
+                            <a href="javascript: setDateChoiceChange(1);"  class="dateSelectBtn" th:text="#{date.select.btn.1}"></a>
+                            <a href="javascript: setDateChoiceChange(2);"  class="dateSelectBtn" th:text="#{date.select.btn.2}"></a>
+                            <a href="javascript: setDateChoiceChange(3);"  class="dateSelectBtn" th:text="#{date.select.btn.3}"></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{sys6.table.th.mod_id}"></th>
+                        <td class="full_input">
+                            <span class="typeText"><input type="text" name="search_id" id="search_id" th:value="${search_id}" th:placeholder="#{enter.id}" /></span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="buttonRight mb50">
+                <a href="javascript:;" class="btnType" id="search_log_btn" th:text="#{search.btn}"></a>
+            </div>
+            <div class="listCountWrap">
+                <h3 class="tit_h3" th:if="${#locale.toString()} == 'ko'" th:text="#{cnt.search} + ' ' + ${systemLogResponse.total_adminLog_count} + #{cnt}"></h3>
+                <h3 class="tit_h3" th:if="${#locale.toString()} == 'en'" th:text="${systemLogResponse.total_adminLog_count} + ' ' + #{cnt.search}"></h3>
+                <span class="typeSelect">
+                    <select name="search_listCount" id="searchListCount">
+                        <option value="10" th:selected="${search_listCount == 10}">10</option>
+                        <option value="20" th:selected="${search_listCount == 20}">20</option>
+                        <option value="50" th:selected="${search_listCount == 50}">50</option>
+                        <option value="100" th:selected="${search_listCount == 100}">100</option>
+                    </select>
+                </span>
+            </div>
+        </form>
+        <div class="tableStyle aCenter mb20">
+            <table>
+                <colgroup>
+                    <col style="width: 10%;" />
+                    <col style="" />
+                    <col style="width: 15%" />
+                    <col style="width: 12%" />
+                    <col style="width: 10%;" />
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th th:text="#{type}"></th>
+                        <th th:text="#{sys6.table.th.content}"></th>
+                        <th th:text="#{sys6.table.th.mod_id}"></th>
+                        <th th:text="#{sys6.table.th.reg_dt}"></th>
+                        <th th:text="#{ip}"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="systemLog : ${systemLogResponse.adminLogList}">
+                        <td th:text="#{sys6.type. + ${systemLog.type}}"></td>
+                        <td th:text="${systemLog.content}" style="text-align: left;"></td>
+                        <td th:text="${systemLog.id}"></td>
+                        <td th:text="${#dates.format(systemLog.reg_dt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                        <td th:text="${systemLog.ip}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="buttonRight">
+            <a href="javascript:;" class="btnType" id="sys6_excel_down_btn" th:text="#{excel.download.btn}"></a>
+        </div>
+        <div class="pageFoot inPaging">
+            <div class="paging">
+                <a href="javascript: goPage('1', '#search_log_form');" class="prevBt"></a>
+                <a th:if="${systemLogResponse.pageNaviResponse.isPrev == 1}" href="javascript: goPrePage('#search_log_form');" class="beforeBt"></a>
+                <a th:if="${systemLogResponse.pageNaviResponse.isPrev != 1}" href="javascript:;" class="beforeBt"></a>
+                <ul th:each="index: ${#numbers.sequence(systemLogResponse.pageNaviResponse.decadeFirst, systemLogResponse.pageNaviResponse.decadeLast)}">
+                    <li th:class="${systemLogResponse.pageNaviResponse.current_page == index ? 'on' : ''}"><a th:href="@{'javascript: goPage(' + ${index} + ', \'#search_log_form\');'}" th:text="${index}"></a></li>
+                </ul>
+                <a th:if="${systemLogResponse.pageNaviResponse.isNext == 1}" href="javascript: goNextPage('#search_log_form');" class="afterBt"></a>
+                <a th:if="${systemLogResponse.pageNaviResponse.isNext != 1}" href="javascript:;" class="afterBt"></a>
+                <a th:href="@{'javascript: goPage(' + ${systemLogResponse.pageNaviResponse.lastPage} + ', \'#search_log_form\');'}" href="javascript: goPage();" class="nextBt"></a>
+            </div>
+        </div>
+    </div>
+    <!-- //contSection -->
+</div>
+<!-- //contents -->
+<th:block layout:fragment="side">
+
+</th:block>
+<th:block layout:fragment="script">
+    <script type="text/javascript" src="/js/datepicker.min.js"></script>
+    <script type="text/javascript" src="/js/i18n/datepicker.ko.js"></script>
+    <script type="text/javascript" src="/js/i18n/datepicker.en.js"></script>
+    <script type="text/javascript" src="/js/include/menu_system.js"></script>
+    <script type="text/javascript" src="/js/system/sys6.js"></script>
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var lang = [[${#locale}]];
+        console.log(lang);
+
+        var DATEPICKER_ALERT_1 = [[#{datepicker.alert.1}]];
+        var ALERT_EXCELDOWNLOAD_ERR_MSG_1 = [[#{alert.exceldownload.err.msg.1}]];
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

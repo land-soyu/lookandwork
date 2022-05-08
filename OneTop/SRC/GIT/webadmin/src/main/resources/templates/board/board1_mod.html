@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout_mod">
+<head>
+    <title th:text="#{board1.mod.title}"></title>
+    <th:block layout:fragment="css"></th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+    <div th:replace="include/menu :: board"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+    <th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+    <div class="contSection" th:if="${securityYN}=='Y'">
+        <h2 class="tit_h2" th:text="#{board1.h2}"></h2>
+        <form action="board1_mod_proc" method="post" name="boardModForm" id="boardModForm">
+            <input type="hidden" name="nextNo" id="nextNo" th:value="${nextNo}" />
+            <input type="hidden" name="pageUrl" id="pageUrl" value="notice">
+            <input type="hidden" name="no" id="no" th:value="${notice.no}" />
+            <input type="hidden" name="admin_id" th:value="${member_proc.id}" />
+            <input type="hidden" name="admin_name" th:value="${member_proc.name}" />
+            <div class="tableStyle2 boardStyle mb20">
+                <table>
+                    <colgroup>
+                        <col style="width: 17%;" />
+                        <col style="width: 33%;" />
+                        <col style="width: 17%;" />
+                        <col style="width: 33%;" />
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th th:text="#{title}"></th>
+                        <td colspan="3" th:if="${mode} == 'modify'"><span class="typeText"><input type="text" name="title" id="title" th:value="${notice.title}" th:placeholder="#{input.title}" /></span></td>
+                        <td colspan="3" th:unless="${mode} == 'modify'"><span class="typeText" th:text="${notice.title}"></span></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{last.modified.date}"></th>
+                        <td>
+                            <p th:text="${#dates.format(notice.mod_dt, 'yyyy-MM-dd HH:mm:ss')}"></p>
+                        </td>
+                        <th th:text="#{name}"></th>
+                        <td>
+                            <p th:text="${notice.admin_name != null ? notice.admin_name : member_proc.name}"></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{status}"></th>
+                        <td th:if="${mode} == 'modify'">
+                            <input type="radio" name="is_secret" id="is_secret_1" value="Y" th:checked="${notice.is_secret == 'Y' || notice.is_secret == null}" /><label for="is_secret_1" th:text="#{public}"></label>
+                            <input type="radio" name="is_secret" id="is_secret_2" value="N" th:checked="${notice.is_secret == 'N'}" /><label for="is_secret_2" th:text="#{private}"></label>
+                        </td>
+                        <td th:unless="${mode} == 'modify'">
+                            <span th:if="${notice.is_secret == 'Y' || notice.is_secret == null}" th:text="#{public}"></span>
+                            <span th:if="${notice.is_secret == 'N'}" th:text="#{private}"></span>
+                        </td>
+                        <th th:text="#{language}"></th>
+                        <td class="typeSelect" th:if="${mode} == 'modify'">
+<!--                            <input type="radio" name="language" id="language_ko" value="ko" th:checked="${notice.lang == 'ko' || notice.lang == null}"/><label for="language_ko" th:text="#{language.ko}"></label>-->
+<!--                            <input type="radio" name="language" id="language_en" value="en" th:checked="${notice.lang == 'en'}"/><label for="language_en" th:text="#{language.en}"></label>-->
+<!--                            <input type="hidden" name="language" id="language_en" value="en" th:checked="checked"/></label>-->
+                            <select name="language" id="language">
+                                <option value="ko" th:selected="${notice.lang== 'ko'}" th:text="#{language.ko}"></option>
+                                <option value="en" th:selected="${notice.lang == 'en'}" th:text="#{language.en}"></option>
+                                <option value="zh" th:selected="${notice.lang == 'zh'}" th:text="#{language.zh}"></option>
+                                <option value="ja" th:selected="${notice.lang == 'ja'}" th:text="#{language.ja}"></option>
+                            </select>
+                        </td>
+                        <td th:unless="${mode} == 'modify'">
+                            <span th:if="${notice.lang == 'ko' || notice.lang == null}" th:text="#{language.ko}"></span>
+                            <span th:if="${notice.lang == 'en'}" th:text="#{language.en}"></span>
+                            <span th:if="${notice.lang == 'zh'}" th:text="#{language.zh}"></span>
+                            <span th:if="${notice.lang == 'ja'}" th:text="#{language.ja}"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{board1.write.table.th.kind}"></th>
+                        <td th:if="${mode} == 'modify'" colspan="3">
+                            <input type="radio" name="type" id="type_1" value="noti" th:checked="${notice.type == 'noti' || notice.type == null}" /><label for="type_1" th:text="#{board1.write.table.th.kind.notice}"></label>
+                            <input type="radio" name="type" id="type_2" value="event" th:checked="${notice.type == 'event'}" /><label for="type_2" th:text="#{board1.write.table.th.kind.event}"></label>
+                        </td>
+                        <td th:unless="${mode} == 'modify'" colspan="3">
+                            <span th:if="${notice.type == 'noti' || notice.type == null}" th:text="#{board1.write.table.th.kind.notice}"></span>
+                            <span th:if="${notice.type == 'event'}" th:text="#{board1.write.table.th.kind.event}"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" th:if="${mode} == 'modify'">
+                            <div class="boardCont">
+                                <textarea id="summernote" name="content"></textarea>
+                            </div>
+                        </td>
+                        <td colspan="4" th:unless="${mode} == 'modify'">
+                            <span th:utext="${#strings.replace(notice.content, image_addr, '/attachments/images')}"></span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="buttonRight">
+                <a href="board1" class="btnType" th:text="#{cancel.btn}"></a>
+                <a th:if="${mode} == 'modify'" href="javascript: saveNotice();" class="btnType" th:text="#{save.btn}"></a>
+                <a th:if="${member_proc.role != 4}" th:unless="${mode} == 'modify'" th:href="@{'board1_mod?no=' + ${notice.no} + '&mode=modify'}" class="btnType" th:text="#{modify.btn}"></a>
+            </div>
+        </form>
+    </div>
+    <!-- //contSection -->
+</div>
+<!-- //contents -->
+<th:block layout:fragment="side"></th:block>
+<th:block layout:fragment="script">
+    <script type="text/javascript" src="/js/include/menu_board.js"></script>
+    <script type="text/javascript" src="/js/board/board1_mod.js"></script>
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+
+        var IMAGE_ADDR = [[${image_addr}]];
+        var CONTENT = [[${#strings.replace(notice.content, image_addr, '/attachments/images')}]];
+
+        /* 알림창 메세지 가져오기 */
+        function getMessage(index) {
+
+            var message = '';
+
+            switch (index) {
+                case 1:
+                    message = [[#{enter.title}]];
+                    break;
+                case 2:
+                    message = [[#{enter.content}]];
+                    break;
+                case 3:
+                    message = [[#{save.message}]];
+                    break;
+                case 4:
+                    message = [[#{image.upload}]];
+                    break;
+                default:
+                    break;
+            }
+
+            return message;
+        }
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+    <title th:text="#{sys2.title}"></title>
+    <th:block layout:fragment="css">
+
+    </th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+    <div th:replace="include/menu :: system"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+    <th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+    <div class="contSection" th:if="${securityYN}=='Y'">
+        <h2 class="tit_h2" th:text="#{sys2.h2}"></h2>
+        <p class="topButton" th:if="${mode} == 'modify'">
+            <a href="javascript:checkImport();" class="btnType" th:text="#{import.btn}"></a>
+        </p>
+        <p class="topButton" th:unless="${mode} == 'modify'">
+            <a href="javascript:checkModify()" class="btnType" th:if="${member_proc.role == 0}" th:text="#{modify.btn}"></a>
+        </p>
+
+        <div class="tableStyle aCenter inputArea mb20">
+            <table>
+                <colgroup>
+					<col style="width: 25%;" />
+					<col style="width: 25%;" />
+                    <col style="width: 25%;" />					
+				</colgroup>
+                <thead>
+                <tr>
+                    <th th:text="#{mon1.subtitle2.th.title1}"></th>
+					<th th:text="#{sys2.table.thead.th.aoto_value}"></th>
+					<th th:text="|LST #{sys2.rate}|"></th>
+                    <th th:text="|LSR #{sys2.rate}|"></th>
+				</tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>BTC</td>
+                    <td th:text="${nowPriceBTC.usd_price}" style="color:#ff0000;"></td>
+                    <td rowspan="2" class="systemBox2" style="color:#ff0000;">
+                        <th:block th:if="${mode} == 'modify'">
+                            <span class="typeText"><input title="" type="text" id="coin_value_3" th:value="${#numbers.formatDecimal(priceSetting.manual_value, 1, 'COMMA', 4, 'POINT')}" onchange="numberWithCommas(this.value, this, null, 0.00, 100000, 4)" onkeypress="return isNumberKey(event)"/></span>                            
+                        </th:block>
+                        <th:block th:unless="${mode} == 'modify'">
+                            <span rowspan="2" th:text="${priceSetting.manual_value}"></span>
+                        </th:block>                       
+                    </td>
+                    <td rowspan="2" class="systemBox2" style="color:#ff0000;">
+                        <th:block th:if="${mode} == 'modify'">
+                            <span class="typeText"><input title="" type="text" id="coin_value_4" th:value="${#numbers.formatDecimal(priceSettingLSR.manual_value, 1, 'COMMA', 4, 'POINT')}" onchange="numberWithCommas(this.value, this, null, 0.00, 100000, 4)" onkeypress="return isNumberKey(event)"/></span>                            
+                        </th:block>
+                        <th:block th:unless="${mode} == 'modify'">
+                            <span rowspan="2" th:text="${priceSettingLSR.manual_value}"></span>
+                        </th:block>                       
+                    </td>
+                </tr>
+                <tr>
+                    <td>ETH</td>
+                    <td th:text="${nowPriceETH.usd_price}" style="color:#ff0000;"></td>
+                </tr>                
+
+                <div style="display: none;">
+                    <select id="coin_ratio_1">
+                        <option>수동</option>
+                        <option selected="selected">자동</option>
+                    </select>
+                    <input title="" type="text" id="coin_value_1" value="1.00">
+                    <select id="coin_ratio_2">
+                        <option>수동</option>
+                        <option selected="selected">자동</option>
+                    </select>
+                    <input title="" type="text" id="coin_value_2" value="1.00">
+                    <select id="coin_ratio_3">
+                        <option selected="selected">수동</option>
+                        <option>자동</option>
+                    </select>                    
+                    <select id="coin_ratio_4">
+                        <option selected="selected">수동</option>
+                        <option>자동</option>
+                    </select>
+                </div>
+
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <br>
+        <h3 class="tit_h3" th:text="#{sys6.type.221}"></h3>
+		<div class="tableStyle aCenter mb50">
+			<table>
+				<colgroup>					
+					<col style="width: 20%;" />
+					<col style="width: 20%;" />
+					<col style="width: 20%;" />
+					<col style="width: 20%;" />
+					<col style="width: 20%;" />
+				</colgroup>
+				<thead>
+				<tr>					
+                    <th th:text="#{sys2.table.thead.th.reinvest}"></th>
+                    <th th:text="#{sys2.table.thead.th.retrieve_min}"></th>
+                    <th th:text="#{sys2.table.thead.th.invest_min}"></th>
+                    <th th:text="#{sys2.table.thead.th.extrapay_rate}"></th>
+                    <th th:text="#{sys2.table.thead.th.target_invest_rate}"></th>
+				</tr>
+				</thead>
+				<tbody>          
+                <tr th:if="${#lists.size(investSetting)} > 0" th:each="setting, iter : ${investSetting}">
+                    <th:block th:if="${mode} == 'modify'" >
+                        <td>
+                            <div class="systemBox2">
+                                <span class="typeText"><input title="" type="text" th:id="coin_reinvest_ + ${iter.index}" th:value="${#numbers.formatDecimal(setting.reinvest_amount, 1, 'COMMA', 0, 'POINT')}" onchange="numberWithCommas(this.value, this, null, 0.00, 100000, 0)" onkeypress="return isNumberKey(event)"/></span><mark>%</mark>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="systemBox2">
+                                <span class="typeText"><input title="" type="text" th:id="coin_retrieve_min_ + ${iter.index}" th:value="${#numbers.formatDecimal(setting.retrieve_min, 1, 'COMMA', 0, 'POINT')}" onchange="numberWithCommas(this.value, this, null, 0.00, 10000000, 0)" onkeypress="return isNumberKey(event)"/></span><mark>(LST)</mark>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="systemBox2">
+                                <span class="typeText"><input title="" type="text" th:id="coin_invest_min_ + ${iter.index}" th:value="${#numbers.formatDecimal(setting.invest_min, 1, 'COMMA', 0, 'POINT')}" onchange="numberWithCommas(this.value, this, null, 0.00, 10000000, 0)" onkeypress="return isNumberKey(event)"/></span><mark>(LST)</mark>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="systemBox2">
+                                <span class="typeText"><input title="" type="text" th:id="coin_extrapay_rate_ + ${iter.index}" th:value="${#numbers.formatDecimal(setting.extrapay_rate, 1, 'COMMA', 0, 'POINT')}" onchange="numberWithCommas(this.value, this, null, 0.00, 1000, 0)" onkeypress="return isNumberKey(event)"/></span><mark>%</mark>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="systemBox2">
+                                <span class="typeText"><input title="" type="text" th:id="coin_target_invest_rate_ + ${iter.index}" th:value="${#numbers.formatDecimal(setting.target_invest_rate, 1, 'COMMA', 0, 'POINT')}" onchange="numberWithCommas(this.value, this, null, 0, 100, 0)" onkeypress="return isNumberKey(event)"/></span><mark>%</mark>
+                            </div>
+                        </td>
+                    </th:block>
+                    <th:block th:unless="${mode} == 'modify'" >
+                        <td th:text="|${setting.reinvest_amount} %|"></td>
+                        <td th:text="|${setting.retrieve_min} (LST)|"></td>
+                        <td th:text="|${setting.invest_min} (LST)|"></td>
+                        <td th:text="|${setting.extrapay_rate} %|"></td>
+                        <td th:text="|${setting.target_invest_rate} %|"></td>
+                    </th:block>
+                </tr>
+                </tbody>
+			</table>
+		</div>
+        <div class="buttonRight" th:if="${mode} == 'modify'">
+            <a href="sys2" class="btnType" id="cancel" th:text="#{cancel.btn}"></a>
+        </div>
+    </div>
+    <!-- //contSection -->
+</div>
+
+<th:block layout:fragment="script">
+    <script type="text/javascript" src="/js/include/menu_system.js"></script>
+    <script type="text/javascript" src="/js/system/sys2.js"></script>
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var STR_Q_IMPORT = [[#{import.message}]];
+        var STR_Q_MODIFY = [[#{sys2.q.modify}]];
+        var STR_NOT_ENOUGH_PARAMS =[[#{import.notenoughparams}]];
+        var STR_REQUEST_FAIL=[[#{import.requestfail}]];
+        var STR_REQUEST_SUCCESS=[[#{import.reuqestsuccess}]];
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

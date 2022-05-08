@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+<title th:text="#{bank1.title}"></title>
+<th:block layout:fragment="css"></th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+    <div th:replace="include/menu :: banking"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+    <th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+    <div class="contSection" th:if="${securityYN}=='Y'">
+            <h2 class="tit_h2"> <span th:text="#{menu.bank.sub1.bank1}"></span>  </h2>
+            
+            <!-- 회원 정보 -->
+            <div class="tableStyle2 mb20">
+                <table>
+                    <colgroup>
+                        <col style="width: 17%;" />
+                        <col style="width: 83%;" />
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th th:text="#{bank1.content.member.no}"></th>
+                        <td th:text="${bankCoinRequest.mb_no}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank1.content.member.id}"></th>
+                        <td th:text="${bankCoinRequest.mb_id}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="aCenter mb40">
+                <a class="btnType" th:href="'javascript: show_member_detail_no(\'' + ${bankCoinRequest.mb_id} + '\', \'' + ${bankCoinRequest.mb_no} + '\')'" th:text="#{bank1.content.member.btn}"></a>
+            </div>
+            
+            <!-- 구매 신청 정보 -->
+            <div class="tableStyle2 mb20">
+            	<h3 class="tit_h3" th:text="#{bank1.content.request.h3}"></h3>
+                <table>
+                    <colgroup>
+                        <col style="width: 17%;" />
+                        <col style="width: 83%;" />
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th th:text="#{bank1.content.request.select_coin}"></th>
+                        <td th:text="${bankCoinRequest.coin_name}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank1.content.request.buy_point}"></th>
+                        <td th:text="${bankCoinRequest.amount+' $'}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank1.content.request.amount}"></th>
+                        <td th:text="${#numbers.formatDecimal(bankCoinRequest.coin_amount, 1, 'COMMA', 4, 'POINT') + ' ' +bankCoinRequest.coin_name}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank1.content.request.price}"></th>
+                        <td th:text="${'1$ = '+#numbers.formatDecimal(bankCoinRequest.quote_amount, 1, 'COMMA', 4, 'POINT') + ' ' +bankCoinRequest.coin_name}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank1.content.request.wallet}"></th>
+                        <td th:text="${bankCoinRequest.address}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+        	</div>
+            
+            <!-- 구매 상태 정보 -->
+            <div class="tableStyle2 mb20">
+            	<h3 class="tit_h3" th:text="#{bank1.content.status.h3}"></h3>
+                <table>
+                    <colgroup>
+                        <col style="width: 17%;" />
+                        <col style="width: 83%;" />
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th th:text="#{bank1.content.status.status}"></th>
+                        <td th:text="#{'bank1.status.' + ${bankCoinRequest.status}}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank1.content.status.sum_deposit_coin}"></th>
+                        <td th:if="${bankCoinRequest.status != 'wait'}" th:text="${#numbers.formatDecimal(bankCoinRequest.coin_amount, 1, 'COMMA', 4, 'POINT') + ' ' +bankCoinRequest.coin_name}"></td>
+                        <td th:unless="${bankCoinRequest.status != 'wait'}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+        	</div>
+            
+            <!-- 입금 정보 -->
+            <div class="tableStyle2 mb20"  th:if="${bankCoinRequest.status == 'complete' || bankCoinRequest.status == 'refund' || bankCoinRequest.status == 'deposit'}">
+            	<h3 class="tit_h3" th:text="#{bank1.content.deposit.h3}"></h3>
+                <div th:if="${#lists.size(depositInfo)} > 0" th:each="depositData, iter : ${depositInfo}">
+                    <table class="tableStyle2 mb20">
+                        <colgroup>
+                            <col style="width: 17%;" />
+                            <col style="width: 83%;" />
+                        </colgroup>
+                        <tbody>
+                        <tr>
+                            <th th:text="#{bank1.content.deposit.date}"></th>
+                            <td th:text="${depositData.reg_dt}"></td>
+                        </tr>
+                        <tr>
+                            <th th:text="#{bank1.content.deposit.txid}"></th>
+                            <td th:text="${depositData.txid}"></td>
+                        </tr>
+                        <tr>
+                            <th th:text="#{bank1.content.deposit.amount}"></th>
+                            <td th:text="${depositData.amount}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+        	</div>
+            
+            <!-- 반환 정보 -->
+            <div class="tableStyle2 mb20" th:if="${bankCoinRequest.status == 'refund'}">
+            	<h3 class="tit_h3" th:text="#{bank1.content.return.h3}"></h3>
+                <table>
+                    <colgroup>
+                        <col style="width: 17%;" />
+                        <col style="width: 83%;" />
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th th:text="#{bank1.content.return.date}"></th>
+                        <td th:text="${bankCoinRequest.complete_dt}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank1.content.return.reason}"></th>
+                        <td th:text="${bankCoinRequest.reason}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank1.content.return.amount}"></th>
+                        <td th:text="${#numbers.formatDecimal(bankCoinRequest.extra_amount, 1, 'COMMA', 4, 'POINT') + ' ' +bankCoinRequest.coin_name}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+        	</div>
+            
+            <!-- 관리자 입력 정보 -->
+            <div class="tableStyle2 mb20" th:if="${bankCoinRequest.status == 'complete' && bankCoinRequest.is_handwriting == 'Y'}">
+            	<h3 class="tit_h3" th:text="#{bank1.content.admin.h3}"></h3>
+                <table>
+                    <colgroup>
+                        <col style="width: 17%;" />
+                        <col style="width: 83%;" />
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th th:text="#{bank1.content.admin.date}"></th>
+                        <td th:text="${bankCoinRequest.complete_dt}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank1.content.admin.asset_type}"></th>
+                        <td th:text="${bankCoinRequest.coin_name}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank1.content.admin.wallet_id}"></th>
+                        <td th:text="${bankCoinRequest.address}"></td>
+                    </tr>
+                    <!-- <tr>
+                        <th th:text="#{bank1.content.admin.buy_point}"></th>
+                        <td th:text="${bankCoinRequest.coin_amount}"></td>
+                    </tr> -->
+                    <tr>
+                        <th th:text="#{bank1.content.admin.reason}"></th>
+                        <td th:text="${bankCoinRequest.reason}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank1.content.admin.admin_id}"></th>
+                        <td th:text="${bankCoinRequest.mg_id}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+        	</div>
+            
+            <!-- 취소 정보 -->
+            <div class="tableStyle2 mb20" th:if="${bankCoinRequest.status == 'cancel'}">
+            	<h3 class="tit_h3" th:text="#{bank1.content.cancel.h3}"></h3>
+                <table>
+                    <colgroup>
+                        <col style="width: 17%;" />
+                        <col style="width: 83%;" />
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th th:text="#{bank1.content.cancel.reason}"></th>
+                        <td th:text="${bankCoinRequest.reason}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank1.content.cancel.admin_id}"></th>
+                        <td th:text="${bankCoinRequest.mg_id}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank1.content.cancel.date}"></th>
+                        <td th:text="${bankCoinRequest.complete_dt}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+        	</div>
+        	
+        	<form id="frm_action" method="post" action="bank1_mod_proc">
+            <input type="hidden" name="idx" th:value="${bankCoinRequest.idx}"/>
+            <input type="hidden" name="mg_id" th:value="${member_proc.id}"/>
+            <input type="hidden" name="coin_name" th:value="${bankCoinRequest.coin_name}"/>
+            <input type="hidden" name="mb_no" th:value="${bankCoinRequest.mb_no}"/>
+            <input type="hidden" name="address" th:value="${bankCoinRequest.address}"/>
+            
+            <!-- 처리 영역 -->
+            <div class="tableStyle2 mb20" th:if="${bankCoinRequest.status == 'wait' || bankCoinRequest.status == 'deposit'}">
+            	<h3 class="tit_h3" th:text="#{bank1.content.action.h3}"></h3>
+                <table>
+                    <colgroup>
+                        <col style="width: 17%;" />
+                        <col style="width: 83%;" />
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th th:text="#{bank1.content.action.type}"></th>
+                        <td>
+                            <input th:if="${bankCoinRequest.status == 'wait'}" type="radio" id="action_type1" name="action_type" value="ACCEPT" required><label th:if="${bankCoinRequest.status == 'wait'}" for="action_type1" th:text="#{bank1.content.action.type.1}"></label>
+                            <input th:if="${bankCoinRequest.status == 'deposit'}" type="radio" id="action_type2" name="action_type" value="RETURN" required><label th:if="${bankCoinRequest.status == 'deposit'}" for="action_type2" th:text="#{bank1.content.action.type.2}"></label>
+                            <input th:if="${bankCoinRequest.status == 'wait'}" type="radio" id="action_type3" name="action_type" value="CANCEL" required><label th:if="${bankCoinRequest.status == 'wait'}" for="action_type3" th:text="#{bank1.content.action.type.3}"></label>
+						</td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank1.content.action.admin_id}"></th>
+                        <td th:text="${member_proc.id}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank1.content.action.deposit_amount}"></th>
+                        <td th:text="${#numbers.formatDecimal(bankCoinRequest.deposit_amount, 1, 'COMMA', 4, 'POINT') + ' ' +bankCoinRequest.coin_name}"></td>
+                    </tr>
+                    <tr th:if="${bankCoinRequest.status == 'deposit'}">
+                        <th th:text="#{bank1.content.action.return_amount}"></th>
+                        <td>
+                        	<span class="typeText">
+                        		<input name="return_amount" type="text" value="0" onchange="numberWithCommas(this.value, this, null, 0.00000000, 9999999999999999.99999999, 8)" onkeypress="return isNumberKey(event)" />
+                    		</span>
+                    		<span th:text="#{bank1.content.action.return_amount.hint}"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank1.content.action.reason}"></th>
+                        <td>
+                        	<span class="typeText">
+                        		<input name="reason" type="text" />
+                    		</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+        	</div>
+        	
+            <div class="buttonRight">
+                <button type="submit" class="btnType" th:text="#{save.btn}" th:if="${bankCoinRequest.status == 'wait' || bankCoinRequest.status == 'deposit'}"></button>
+                <a href="bank1" class="btnType" th:text="#{bank1.content.list.btn}"></a>
+            </div>
+            
+            </form>
+
+        </div>
+        <!-- //contSection -->
+</div>
+
+<!-- //contents -->
+<th:block layout:fragment="side">
+</th:block>
+
+<th:block layout:fragment="script">
+    <script type="text/javascript" src="/js/rsa/rsa.js"></script>
+    <script type="text/javascript" src="/js/rsa/jsbn.js"></script>
+    <script type="text/javascript" src="/js/rsa/prng4.js"></script>
+    <script type="text/javascript" src="/js/rsa/rng.js"></script>
+    <script type="text/javascript" src="/js/banking/bank1_mod.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var BANK1_CONTENT_SAVE_CONFIRM = [[#{bank1.content.save.confirm}]];
+        var IMPORT_REQUESTFAIL = [[#{import.requestfail}]];
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

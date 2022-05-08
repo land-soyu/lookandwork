@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+<title th:text="#{auth1.mod.title}"></title>
+<th:block layout:fragment="css">
+
+</th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+    <div th:replace="include/menu :: authority"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+    <th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+    <div class="contSection" th:if="${securityYN}=='Y'">
+        <h2 class="tit_h2" th:text="#{auth1.h2}"></h2>
+        <form action="auth1_mod" method="post" name="adminMemberForm" id="adminMemberForm">
+            <input type="hidden" name="no" id="no" th:value="${adminMember.no}" />
+            <input type="hidden" name="modulus" id="modulus" th:value="${modulus}">
+            <input type="hidden" name="exponent" id="exponent" th:value="${exponent}">
+            <div class="tableStyle2 authorityList mb20">
+                <table>
+                    <colgroup>
+                        <col style="width: 17%;" />
+                        <col style="width: 33%;" />
+                        <col style="width: 17%;" />
+                        <col style="width: 33%;" />
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th colspan="4" th:text="#{operator.information}"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th th:text="#{auth1.mod.table.tbody.th.name}"></th>
+                            <td>
+                                <span class="typeText">
+                                    <input type="text" name="name" id="name" th:value="${adminMember.name}" th:placeholder="#{auth1.mod.table.tbody.td.name}" />
+                                </span>
+                            </td>
+                            <th th:text="#{auth1.mod.table.tbody.th.pwd}"></th>
+                            <td>
+                                <span class="typeText">
+                                    <input type="password" name="password" id="password" th:placeholder="#{auth1.mod.table.tbody.td.pwd}" />
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th th:text="#{auth1.mod.table.tbody.th.id}"></th>
+                            <td>
+                                <span class="typeText">
+                                    <input type="text" name="id" id="id" th:if="${adminMember.id == null}" th:placeholder="#{enter.id}" />
+                                    <span th:if="${adminMember.id != null}" th:text="${adminMember.id}"></span>
+                                </span>
+                            </td>
+                            <th th:text="#{contacts}"></th>
+                            <td>
+                                <span class="typeText">
+                                    <input type="text" name="phone_number" id="phone_number" th:if="${adminMember.phone_number == null}" th:placeholder="#{enter.contacts}" />
+                                    <span th:if="${adminMember.phone_number != null}" th:text="${adminMember.phone_number}"></span>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th th:text="#{auth1.mod.table.tbody.th.auth}"></th>
+                            <td>
+                                <span class="typeSelect">
+                                    <select name="role" id="role">
+                                        <option th:each="accessRole : ${accessRoleList}" th:value="${accessRole.role}" th:text="#{header.role.desc. + ${accessRole.role}}" th:selected="${adminMember.role == accessRole.role}"></option>
+                                    </select>
+                                </span>
+                            </td>                            
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </form>
+        <div class="buttonRight">
+            <a href="auth1" class="btnType" th:text="#{cancel.btn}"></a>
+            <a href="javascript: deleteAdminMember();" class="btnType" th:if="${adminMember.no != 0}" th:text="#{delete.btn}"></a>
+            <a href="javascript: saveAdminMember();" class="btnType" th:text="#{save.btn}"></a>
+        </div>
+    </div>
+    <!-- //contSection -->
+</div>
+<!-- //contents -->
+<th:block layout:fragment="side">
+
+</th:block>
+<th:block layout:fragment="script">
+<script type="text/javascript" th:inline="javascript">
+/*<![CDATA[*/
+function getMessage(index) {
+
+    var message = '';
+
+    switch (index) {
+        case 1:
+            message = [[#{auth1.mod.alert.text.input_name}]];
+            break;
+        case 2:
+            message = [[#{auth1.mod.alert.text.input_id}]];
+            break;
+        case 3:
+            message = [[#{auth1.mod.alert.text.select_auth}]];
+            break;
+        case 4:
+            message = [[#{auth1.mod.alert.text.input_pwd}]];
+            break;
+        case 5:
+            message = [[#{auth1.mod.alert.text.exist_id}]];
+            break;
+        case 6:
+            message = [[#{save.message}]];
+            break;
+        case 7:
+            message = [[#{auth1.alert.text.real_delete}]];
+            break;
+        case 8:
+            message = [[#{password.check}]];
+            break;
+        default:
+            break;
+    }
+
+    return message;
+}
+/*]]>*/
+</script>
+<script type="text/javascript" src="/js/include/menu_authority.js"></script>
+<script type="text/javascript" src="/js/rsa/rsa.js"></script>
+<script type="text/javascript" src="/js/rsa/jsbn.js"></script>
+<script type="text/javascript" src="/js/rsa/prng4.js"></script>
+<script type="text/javascript" src="/js/rsa/rng.js"></script>
+<script type="text/javascript" src="/js/authority/auth1_mod.js"></script>
+</th:block>
+</body>
+</html>

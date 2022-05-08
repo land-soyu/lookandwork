@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragment.MainFragment"
+    android:background="@color/WHITE"
+    android:orientation="vertical"
+    android:id="@+id/layout_main"
+    >
+
+    <Button
+        android:id="@+id/bt_roomcreate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ROOM CREATE"
+        />
+    <ListView
+        android:id="@+id/lv_roomlist"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+    </ListView>
+    <TextView
+        android:id="@+id/lv_emptylist"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="Empty Room"/>
+</LinearLayout>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+<title th:text="#{bank41.title}"></title>
+<th:block layout:fragment="css"></th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+    <div th:replace="include/menu :: banking"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+    <th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+    <div class="contSection" th:if="${securityYN}=='Y'" id="contentView1" >
+        <form action="bank41" name="search_bank41_form" id="search_bank41_form" method="POST">
+            <input type="hidden" name="sortName" th:value="${sortName}"/>
+            <input type="hidden" name="sortOrderBy" th:value="${sortOrderBy}"/>
+            <input type="hidden" name="page" id="page" th:value="${page}" />
+            <input type="hidden" name="total" id="total" th:value="${response.counts.search}" />
+            <h2 class="tit_h2" th:text="#{bank41.h2}"></h2>
+            <div class="tableStyle2 bankInfo mb20">
+                <table>
+                    <colgroup>
+                        <col style="width: 17%;" />
+                        <col style="width: 33%;" />
+                        <col style="width: 17%" />
+                        <col style="width: 33%" />
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th th:text="#{member.id}"></th>
+                        <td><span class="typeText"><input name="mb_id" type="text" th:placeholder="#{member.id}" th:value="${mb_id}"/></span></td>
+                        <th th:text="#{completion.date} + ' *'"> *</th>
+                        <td>
+                            <a href="javascript: setDateChoiceChange(0);"  class="dateSelectBtn2" th:text="#{bank41.date.select.btn.1}"></a>
+                            <a href="javascript: setDateChoiceChange(2);"  class="dateSelectBtn2" th:text="#{bank41.date.select.btn.2}"></a>
+                            <p class="dateChoice">
+                                 <span>
+                                    <img src="/images/calendar_icon.png"/>
+                                    <input id="req_dt" name="req_dt" type="text" class="datepicker-here"
+                                           data-range="true"
+                                           data-multiple-dates-separator=" - "
+                                           th:data-language="${#locale}"
+                                           placeholder="YYYY.MM.DD - YYYY.MM.DD"
+                                           th:value="${req_dt != null} ? ${req_dt} : ''"
+                                    />
+                                </span>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank41.table.thead.th.od_request_address}"></th>
+                        <td>
+                            <span class="typeText"><input type="text" name="od_request_address" th:placeholder="#{bank41.table.thead.th.od_request_address}" th:value="${od_request_address}"/></span>
+                        </td>
+                        <th th:text="#{bank41.table.coin} + ' *'"></th>
+                        <td class="sortTable">
+                            <span class="typeSelect">
+                                <select name="coin_name">
+                                    <option th:text="#{all}" value="ALL" th:selected="${coin_name}=='ALL' ? 'true' : 'false'"></option>
+                                    <th:block th:if="${#lists.size(response.coinList)} > 0" th:each="coin : ${response.coinList}">
+                                        <option th:attr="value=${coin.coin_name}" th:selected="(${coin_name}==${coin.coin_name}) ? 'true' : 'false'" th:text="${coin.coin_name}"></option>
+                                    </th:block>
+                                </select>
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank1.content.deposit.txid}"></th>
+                        <td>
+                            <span class="typeText"><input type="text" name="txid" th:placeholder="#{tx.id}" th:value="${txid}"/></span>
+                        </td>
+                        <th th:text="#{status} + ' *'"></th>
+                        <td>
+                            <span class="typeSelect">
+                                <select name="status">
+                                    <option th:text="#{all}" value="ALL" th:selected="${status} or ${status} == 'ALL' ? 'true' : 'false'"></option>
+                                    <option th:text="#{bank41.table.thead.th.status.ING}" value="pending" th:selected="${status} == 'pending' ? 'true' : 'false'"></option>
+                                    <option th:text="#{bank41.table.thead.th.status.OK}" value="complete" th:selected="${status} == 'complete' ? 'true' : 'false'"></option>
+                                    <option th:text="#{bank41.table.thead.th.status.REJECT}" value="reject" th:selected="${status} == 'reject' ? 'true' : 'false'"></option>
+                                </select>
+                            </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="buttonRight mb50">
+                <a href="javascript:void(0);" class="btnType" id="search_bank41_btn" th:text="#{search.btn}"></a>
+            </div>
+            <div class="listCountWrap">
+                <h3 class="tit_h3" th:if="${#locale.toString()} == 'ko'" th:text="#{cnt.search} + ' ' + ${response.counts.search}  + #{cnt}"></h3>
+                <h3 class="tit_h3" th:if="${#locale.toString()} == 'en'" th:text="${response.counts.search} + ' ' + #{cnt.search}"></h3>
+                <span class="typeSelect">
+                    <a href="javascript:void(0);" id="bank41_excel_down_btn" class="btnType" th:text="#{excel.download.btn}">Excel D/L</a>
+                    <select name="search_listCount" id="searchListCount">
+                        <option value="10" th:selected="${search_listCount == 10}">10</option>
+                        <option value="20" th:selected="${search_listCount == 20}">20</option>
+                        <option value="50" th:selected="${search_listCount == 50}">50</option>
+                        <option value="100" th:selected="${search_listCount == 100}">100</option>
+                    </select>
+                </span>
+            </div>
+            <div class="tableStyle bankInfo aCenter head2 font13 mb20 fitTable">
+                <table>
+                    <colgroup>
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th th:text="#{number_}"></th>
+                        <th ><p class="orderby"><span th:text="#{completion.date}"></span> <button type="button" id="update_dt" onclick="orderBy(this.id);" th:style="${sortName == 'update_dt'} ? 'color:red;' : ''" th:text="${sortName == 'update_dt' and sortOrderBy == 'ASC'} ? #{orderby.asc} : #{orderby.desc}"></button></p></th>
+                        <th th:text="#{member.id}"></th>
+                        <th tstyle="max-width: 100px;"> <span th:text="#{bank41.table.thead.th.od_request_address}"></span></th>
+                        <th tstyle="max-width: 100px;"> <span th:text="#{tx.id}"></span></th>
+                        <th><p class="orderby" th:text="#{bank41.table.thead.th.amount}"></p></th>
+                        <th th:text="#{status}"></th>
+                        <th th:text="#{bank41.approval}"></th>
+                        <th th:text="#{bank41.search.withdraw.method}"></th>
+                        <th th:text="#{bank41.search.exchange.withdraw}"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    <tr th:if="${#lists.size(response.withdrawRequestList)} > 0" th:each="withdrawRequest, iter : ${response.withdrawRequestList}" th:class="${withdrawRequest.status == 'REQ'} ? 'bgRed' : (${withdrawRequest.status == 'HOLD'} ? 'bgOrange' : '')">
+                        <td th:text="${withdrawRequest.rownum}"></td>
+                        <td>
+                            <span th:text="${#dates.format(withdrawRequest.update_dt, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                        </td>
+                        <td>
+                            <a th:href="|javascript:contentViewOffDisplay_('${withdrawRequest.idx}', '${withdrawRequest.mb_no}', '${withdrawRequest.mb_id}', '${withdrawRequest.status}', '${withdrawRequest.txid}',
+                            '${withdrawRequest.withdraw_address}', '${withdrawRequest.update_dt}', '${withdrawRequest.reject}', '${withdrawRequest.quote_amount}', 
+                            ${withdrawRequest.withdraw_batch_id > 0} ? 'O' : 'X', ${withdrawRequest.withdraw_exchange > 0} ? 'O' : 'X', '${withdrawRequest.mg_id}', '${withdrawRequest.withdraw_amount}'
+                            , '${withdrawRequest.create_dt}', '${withdrawRequest.return_reason}', '${withdrawRequest.return_amount}', '${withdrawRequest.return_mg_id}');|" th:text="${withdrawRequest.mb_id}"></a>
+                        </td>
+                        <td th:text="${withdrawRequest.withdraw_address}"></td>
+                        <td th:text="${withdrawRequest.txid}"></td>
+                        <td th:text="${#numbers.formatDecimal(withdrawRequest.withdraw_amount, 1, 'COMMA', 4, 'POINT') + ' ' +withdrawRequest.coin_name} "></td>
+                        <td>
+                            <span th:if="${withdrawRequest.status == 'wait'}" th:text="#{bank41.table.thead.th.status.WAIT}"></span>
+                            <span th:if="${withdrawRequest.status == 'complete'}" th:text="#{bank41.table.thead.th.status.OK}"></span>
+                            <span th:if="${withdrawRequest.status == 'pending'}" th:text="#{bank41.table.thead.th.status.ING}"></span>
+                            <span th:if="${withdrawRequest.status == 'reject'}" th:text="#{bank41.table.thead.th.status.REJECT}"></span>
+                            <span th:if="${withdrawRequest.status == 'refund'}" th:text="#{bank41.table.thead.th.status.REFUND}"></span>
+                        </td>
+                        <td th:text="${withdrawRequest.status == 'reject'} ? 'X' : 'O'">
+                        </td>
+                        <td th:text="${withdrawRequest.status == 'reject'} ? '-' : (${withdrawRequest.withdraw_batch_id > 0} ? 'O' : 'X')">
+                        </td>
+                        <td th:text="${withdrawRequest.status == 'reject'} ? '-' : (${withdrawRequest.withdraw_exchange > 0} ? 'O' : 'X')">
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pageFoot mb50">
+                <!--<p class="footText mb15">[ 최종 동기화 : YYYY.MM.DD 23:59:00 ]</p>-->
+                <ul class="footList">
+                    <li th:text="#{footer.message.1}"></li>
+                </ul>
+            </div>
+            <div class="pageFoot inPaging">
+                <div class="paging">
+                    <a href="javascript: goPage('1', '#search_bank41_form');" class="prevBt"></a>
+                    <a th:if="${response.pageNaviResponse.isPrev == 1}" href="javascript: goPrePage('#search_bank41_form');" class="beforeBt"></a>
+                    <a th:if="${response.pageNaviResponse.isPrev != 1}" href="javascript:;" class="beforeBt"></a>
+                    <ul th:each="index: ${#numbers.sequence(response.pageNaviResponse.decadeFirst, response.pageNaviResponse.decadeLast)}">
+                        <li th:class="${response.pageNaviResponse.current_page == index ? 'on' : ''}"><a th:href="@{'javascript: goPage(' + ${index} + ', \'#search_bank41_form\');'}" th:text="${index}"></a></li>
+                    </ul>
+                    <a th:if="${response.pageNaviResponse.isNext == 1}" href="javascript: goNextPage('#search_bank41_form');" class="afterBt"></a>
+                    <a th:if="${response.pageNaviResponse.isNext != 1}" href="javascript:;" class="afterBt"></a>
+                    <a th:href="@{'javascript: goPage(' + ${response.pageNaviResponse.lastPage} + ', \'#search_bank41_form\');'}" href="javascript: goPage();" class="nextBt"></a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- content view 2 -->
+    <div class="contSection" th:if="${securityYN}=='Y'" id="contentView2" hidden>
+        <h2 class="tit_h2" th:text="#{bank41.h2}"></h2>
+        <div class="tableStyle2 bankInfo mb20">
+            <table>
+                <colgroup>
+                    <col style="width: 30%;" />
+                    <col style="width: 70%;" />
+                </colgroup>
+                <tbody>
+                    <tr>
+                        <th th:text="#{bank41.content2.member.no}"></th>
+                        <td id="content2_member_no" th:text="회원번호"></td>
+                    </tr>
+                    <tr>
+                    <th th:text="#{member.id}"></th>
+                    <td id="content2_member_id" th:text="#{member.id}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <div style="text-align: center;">
+                <a th:href="'javascript:show_member_detail_no_41()'"  class="requestTotalBtn" th:text="#{bank31.content2.member.view}"></a>
+            </div>
+        </div>
+
+        <!-- 출금 완료 정보 -->
+        <div class="listCountWrap">
+            <h3 class="tit_h3" th:text="#{bank41.content2.withdraw.data}"></h3>
+        </div>
+        <div class="tableStyle2 bankInfo mb20">
+            <table>
+                <colgroup>
+                    <col style="width: 30%;" />
+                    <col style="width: 70%;" />
+                </colgroup>
+                <tbody>
+                    <tr>
+                        <th th:text="#{bank41.approval}"></th>
+                        <td id="content2_withdraw_approval" th:text="승인결과"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank41.content2.withdraw.sum}"></th>
+                        <td id="content2_withdraw_sum" th:text="#{member.id}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank41.content2.withdraw.exchange}"></th>
+                        <td id="content2_withdraw_exchange" th:text="#{member.id}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{tx.id}"></th>
+                        <td id="content2_txid" th:text="#{member.id}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank41.content2.withdraw.exchange.address}"></th>
+                        <td id="content2_withdraw_exchange_address" th:text="거래소출금지갑주소"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- 출금 승인자 정보 -->
+        <div class="listCountWrap">
+            <h3 class="tit_h3" th:text="#{bank41.content2.withdraw.approval.user}"></h3>
+        </div>
+        <div class="tableStyle2 bankInfo mb20">
+            <table>
+                <colgroup>
+                    <col style="width: 30%;" />
+                    <col style="width: 70%;" />
+                </colgroup>
+                <tbody>
+                    <tr>
+                        <th th:text="#{bank41.content2.withdraw.approval.date}"></th>
+                        <td id="content2_withdraw_approval_date" th:text="승인일시"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank41.content2.withdraw.approval.id}"></th>
+                        <td id="content2_withdraw_approval_id" th:text="승인아이디"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank41.content2.withdraw.approval.reject}"></th>
+                        <td id="content2_withdraw_approval_reject" th:text="거절사유"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="tableStyle2 mb20" id="returnView">
+        <div class="listCountWrap">
+            <h3 class="tit_h3" th:text="#{bank41.content2.withdraw.return.data}"></h3>
+        </div>
+        <div class="tableStyle2 bankInfo mb20">
+            <table>
+                <colgroup>
+                    <col style="width: 30%;" />
+                    <col style="width: 70%;" />
+                </colgroup>
+                <tbody>
+                    <tr>
+                        <th th:text="#{bank41.content2.withdraw.return.date}"></th>
+                        <td id="content2_withdraw_return_date" th:text="반환처리시각"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank41.content2.withdraw.return.reason}"></th>
+                        <td id="content2_withdraw_return_reason" th:text="반환사유"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank41.content2.withdraw.return.amount}"></th>
+                        <td id="content2_withdraw_return_amount" th:text="반환수량"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank41.content2.withdraw.return.id}"></th>
+                        <td id="content2_withdraw_return_id" th:text="반환관리자ID"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        </div>
+        <div style="text-align: center;">
+            <a href="javascript: contentViewOnDisplay();"  class="requestTotalBtn" th:text="#{confirm.btn}"></a>
+        </div>
+    </div>
+    <!-- //contSection -->
+</div>
+<!-- //contents -->
+<th:block layout:fragment="side"></th:block>
+<th:block layout:fragment="script">
+    <link rel="stylesheet" href="/css/datepicker.min.css"/>
+    <script type="text/javascript" src="/js/datepicker.min.js"></script>
+    <script type="text/javascript" src="/js/i18n/datepicker.ko.js"></script>
+    <script type="text/javascript" src="/js/i18n/datepicker.en.js"></script>
+    <script type="text/javascript" src="/js/include/menu_banking.js"></script>
+    <script type="text/javascript" src="/js/banking/bank41.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var coinlist = /*[[${response.coinList}]]*/ null;
+        var DATEPICKER_ALERT_1 = [[#{datepicker.alert.1}]];
+        var SENDMAIL_WITHDRAW = [[#{send.mail.withdraw}]];
+        var SENDMAILSUCCESS = [[#{send.mail.success}]];
+        var ALERT_EXCELDOWNLOAD_ERR_MSG_1 = [[#{alert.exceldownload.err.msg.1}]];
+     /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

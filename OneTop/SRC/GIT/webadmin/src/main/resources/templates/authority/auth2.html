@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+<title th:text="#{auth2.title}"></title>
+<th:block layout:fragment="css">
+    <link rel="stylesheet" href="/css/datepicker.min.css"/>
+</th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+    <div th:replace="include/menu :: authority"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+    <th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+    <div class="contSection" th:if="${securityYN}=='Y'">
+        <h2 class="tit_h2" th:text="#{auth2.h2}"></h2>
+        <form action="auth2" method="get" name="search_log_form" id="search_log_form">
+            <input type="hidden" name="page" id="page" th:value="${page}" />
+            <input type="hidden" name="total" id="total" th:value="${adminLogResponse.total_adminLog_count}">
+            <div class="tableStyle2 authorityList mb20">
+                <table>
+                    <colgroup>
+                        <col style="width: 17%;" />
+                        <col style="width: 33%;" />
+                        <col style="width: 17%;" />
+                        <col style="width: 33%;" />
+                    </colgroup>
+                    <tbody>
+                        <tr>
+                            <th th:text="#{auth2.table.tbody.th.type} + ' *'"></th>
+                            <td>
+                                <input type="radio" id="search_type1" name="search_type" value="all" th:checked="${search_type == 'all'}" checked/><label for="search_type1" th:text="#{all}"></label>
+                                <input type="radio" id="search_type2" name="search_type" value="1" th:checked="${search_type == '1'}"/><label for="search_type2" th:text="#{auth2.radio.1}"></label>
+                                <input type="radio" id="search_type3" name="search_type" value="2" th:checked="${search_type == '2'}"/><label for="search_type3" th:text="#{auth2.radio.2}"></label>
+                            </td>
+                            <th th:text="#{auth2.table.tbody.th.reg_dt} + ' *'"></th>
+                            <td>
+                                <p class="dateChoice">
+                                    <span>
+                                        <img src="/images/calendar_icon.png" alt="날짜선택" />
+                                        <input id="search_reg_dt" name="search_reg_dt" type="text" class="datepicker-here" data-range="true" data-multiple-dates-separator=" - " th:data-language="${#locale}" placeholder="YYYY.MM.DD - YYYY.MM.DD" th:value="${search_reg_dt != null} ? ${search_reg_dt} : ''" />
+                                    </span>
+                                </p>
+                                <a href="javascript: setDateChoiceChange(1);"  class="dateSelectBtn" th:text="#{date.select.btn.1}"></a>
+                                <a href="javascript: setDateChoiceChange(2);"  class="dateSelectBtn" th:text="#{date.select.btn.2}"></a>
+                                <a href="javascript: setDateChoiceChange(3);"  class="dateSelectBtn" th:text="#{date.select.btn.3}"></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>ID</th>
+                            <td><span class="typeText"><input type="text" name="search_id" id="search_id" th:value="${search_id}" th:placeholder="#{enter.id}" /></span></td>
+                            <th>IP</th>
+                            <td><span class="typeText"><input type="text" name="search_ip" id="search_ip" th:value="${search_ip}" th:placeholder="#{auth2.table.tbody.td.ip}" /></span></td>
+                        </tr>
+                    </tbody>
+
+                </table>
+            </div>
+            <div class="buttonRight mb50">
+                <a href="javascript:;" id="search_log_btn" class="btnType" th:text="#{search.btn}"></a>
+            </div>
+            <div class="listCountWrap">
+                <h3 class="tit_h3" th:if="${#locale.toString()} == 'ko'" th:text="#{cnt.search} + ' ' + ${adminLogResponse.total_adminLog_count}  + #{cnt}"></h3>
+                <h3 class="tit_h3" th:if="${#locale.toString()} == 'en'" th:text="${adminLogResponse.total_adminLog_count} + ' ' + #{cnt.search}"></h3>
+                <span class="typeSelect">
+                    <select name="search_listCount" id="searchListCount">
+                        <option value="10" th:selected="${search_listCount == 10}">10</option>
+                        <option value="20" th:selected="${search_listCount == 20}">20</option>
+                        <option value="50" th:selected="${search_listCount == 50}">50</option>
+                        <option value="100" th:selected="${search_listCount == 100}">100</option>
+                    </select>
+                </span>
+            </div>
+        </form>
+        <div class="tableStyle authorityList aCenter mb20">
+            <table>
+                <colgroup>
+                    <col style="width: 5%;" />
+                    <col style="width: 20%;" />
+                    <col style="width: 40%" />
+                    <col style="width: 12%;" />
+                    <col style="width: 13%;" />
+                    <col style="width: 10%;" />
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th th:text="#{auth2.table.thead.th.no}"></th>
+                        <th th:text="#{auth2.table.tbody.th.type}"></th>
+                        <th th:text="#{auth2.table.thead.th.content}"></th>
+                        <th th:text="#{auth2.table.thead.th.id}"></th>
+                        <th th:text="#{auth2.table.tbody.th.reg_dt}"></th>
+                        <th th:text="#{ip}"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="adminLog : ${adminLogResponse.adminLogList}">
+                        <td th:text="${adminLog.no}"></td>
+                        <td th:text="#{'auth2.type.' + ${adminLog.type}}"></td>
+                        <td th:text="${adminLog.content}"></td>
+                        <td th:text="${adminLog.id}"></td>
+                        <td th:text="${#dates.format(adminLog.reg_dt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                        <td th:text="${adminLog.ip}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="buttonRight">
+            <a href="javascript:;" class="btnType" id="auth2_excel_down_btn" th:text="#{excel.download.btn}"></a>
+        </div>
+        <div class="pageFoot inPaging">
+            <div class="paging">
+                <a href="javascript: goPage('1', '#search_log_form');" class="prevBt"></a>
+                <a th:if="${adminLogResponse.pageNaviResponse.isPrev == 1}" href="javascript: goPrePage('#search_log_form');" class="beforeBt"></a>
+                <a th:if="${adminLogResponse.pageNaviResponse.isPrev != 1}" href="javascript:;" class="beforeBt"></a>
+                <ul th:each="index: ${#numbers.sequence(adminLogResponse.pageNaviResponse.decadeFirst, adminLogResponse.pageNaviResponse.decadeLast)}">
+                    <li th:class="${adminLogResponse.pageNaviResponse.current_page == index ? 'on' : ''}"><a th:href="@{'javascript: goPage(' + ${index} + ', \'#search_log_form\');'}" th:text="${index}"></a></li>
+                </ul>
+                <a th:if="${adminLogResponse.pageNaviResponse.isNext == 1}" href="javascript: goNextPage('#search_log_form');" class="afterBt"></a>
+                <a th:if="${adminLogResponse.pageNaviResponse.isNext != 1}" href="javascript:;" class="afterBt"></a>
+                <a th:href="@{'javascript: goPage(' + ${adminLogResponse.pageNaviResponse.lastPage} + ', \'#search_log_form\');'}" href="javascript: goPage();" class="nextBt"></a>
+            </div>
+        </div>
+    </div>
+    <!-- //contSection -->
+</div>
+<!-- //contents -->
+<th:block layout:fragment="side"></th:block>
+<th:block layout:fragment="script">
+    <script type="text/javascript" src="/js/datepicker.min.js"></script>
+    <script type="text/javascript" src="/js/i18n/datepicker.ko.js"></script>
+    <script type="text/javascript" src="/js/i18n/datepicker.en.js"></script>
+    <script type="text/javascript" src="/js/include/menu_authority.js"></script>
+    <script type="text/javascript" src="/js/authority/auth2.js"></script>
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var DATEPICKER_ALERT_1 = [[#{datepicker.alert.1}]];
+        var ALERT_EXCELDOWNLOAD_ERR_MSG_1 = [[#{alert.exceldownload.err.msg.1}]];
+
+        var lang = [[${#locale}]];
+        console.log(lang);
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

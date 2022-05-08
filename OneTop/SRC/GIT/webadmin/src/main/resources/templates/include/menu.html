@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>LNB</title>
+</head>
+<body>
+
+
+
+    <!--상단 메뉴-->
+    <header id="header" th:fragment="header">
+        <div class="header">
+            <div class="topNavi">
+                <h1 id="bi_btn">Cryptocurrency Management System</h1>
+                <p class="state" th:if="${member_proc != null}">
+                    <th:block th:if="${member_proc.is_password_init == 'Y'}">
+                        <a class="member" th:text="'[' + ${member_proc.name} + ' / ' + #{header.role.desc. + ${member_proc.role}} + ']'"></a>
+                    </th:block>
+                    <th:block th:unless="${member_proc.is_password_init == 'Y'}">
+                        <a href="admin_mod" target="_blank" class="member" th:text="'[' + ${member_proc.name} + '/' + #{header.role.desc. + ${member_proc.role}} + ']'"></a>
+                    </th:block>
+                    <a href="javascript: logout();" class="logout" th:text="#{header.logout.btn}"></a>
+                </p>
+            </div>
+            <div class="menu" th:if="${member_proc != null}">
+                <ul>
+                    <!-- <li id="li_mon"><a href="dashboard" th:text="#{header.li.mon}"></a></li> -->
+                    <li id="li_sys" th:if="${member_proc.role == 0 || member_proc.role == 1}"><a href="sys2" th:text="#{header.li.sys}"></a></li>
+                    <li id="li_mem" th:if="${member_proc.role != 2}">
+                        <a href="mem1" th:text="#{header.li.mem}"></a>
+                    </li>
+                    <li id="li_bank" th:if="${member_proc.role == 0 || member_proc.role == 1}"><a href="bank1" th:text="#{header.li.bank}"></a></li>
+                    <li id="li_board" th:if="${member_proc.role != 3}"><a href="board1" th:text="#{header.li.board}"></a></li>
+                    <li id="li_auth" th:if="${member_proc.role == 0}"><a href="auth1" th:text="#{header.li.auth}"></a></li>
+                </ul>
+            </div>
+        </div>
+        <script type="text/javascript" th:inline="javascript">
+            /*<![CDATA[*/
+            var logout_text = [[#{header.logout.text}]];
+            /*]]>*/
+        </script>
+    </header>
+
+
+
+    <!--모니터링-->
+    <!-- <ul th:fragment="monitoring">
+        <li><a href="dashboard" class="dashboard"><span th:text="#{menu.mon.sub1}"></span></a></li>
+    </ul> -->
+
+
+
+    <!--시스템 관리-->
+    <ul class="lnb2" th:fragment="system">
+        <!-- <li class="m1">
+            <a href="javascript:void(0);"><span th:text="#{menu.sys.sub1}"></span></a>
+            <ul class="sub_menu">
+                <li><a href="sys1" th:text="#{menu.sys.sub1.sys1}"></a></li>
+                <li><a href="sys2" th:text="#{menu.sys.sub1.sys2}"></a></li>
+            </ul>
+        </li> -->
+        <!-- <li class="m2">
+            <a href="javascript:void(0);"><span th:text="#{menu.sys.sub2}"></span></a>
+            <ul class="sub_menu">
+                <li><a href="sys3" th:text="#{menu.sys.sub2.sys3}"></a></li>
+                <li><a href="sys9" th:text="#{menu.sys.sub2.sys9}"></a></li>
+            </ul>
+        </li> -->
+        <!-- <li class="m3">
+            <a href="javascript:void(0);"><span th:text="#{menu.system.sub3}"></span></a>
+            <ul class="sub_menu">
+                <li><a href="/basicextrapay" th:text="#{menu.system.basicextrapay}"></a></li>
+                <li><a href="/sponsorextrapay" th:text="#{menu.system.sponsorextrapay}"></a></li>
+                <li><a href="/encourageextrapay" th:text="#{menu.system.encourageextrapay}"></a></li>
+                <li><a href="/rankextrapay" th:text="#{menu.system.rankextrapay}"></a></li>
+            </ul>
+        </li> -->
+        <li class="m4">
+            <a href="/mem18"><span th:text="#{menu.mem.mem18}"></span></a>
+        </li>
+        <li class="m5" th:if="${member_proc.role != 1}">
+            <a href="/sys6"><span th:text="#{menu.sys.sys6}"></span></a>
+        </li>
+    </ul>
+
+
+
+    <!--회원관리-->
+    <ul class="lnb3" th:fragment="member">
+        <li class="m1">
+            <a href="javascript:void(0);"><span th:text="#{menu.mem.sub1}"></span></a>
+            <ul class="sub_menu">
+                <li><a href="mem1" th:text="#{menu.mem.sub1.mem1}"></a></li>
+                <li><a href="mem8" th:text="#{menu.mem.sub1.mem8}"></a></li>
+                <li><a href="mem17" th:text="#{menu.mem.sub3.mem17}"></a></li>
+            </ul>
+        </li>
+        <li class="m2">
+            <a href="javascript:void(0);"><span th:text="#{menu.mem.sub4}"></span></a>
+            <ul class="sub_menu">
+                <li><a href="mem4" th:text="|- #{menu.mem.sub4.mem4}|"></a></li>
+                <li><a href="mem3" th:text="|- #{menu.mem.sub4.mem3}|"></a></li>
+            </ul>
+        </li>
+        <li class="m3">
+            <a href="javascript:void(0);"><span th:text="#{menu.mem.sub2}"></span></a>
+            <ul class="sub_menu">
+                <li><a href="mem5" th:text="#{menu.mem.sub2.mem5}"></a></li>
+                <!-- <li><a href="mem6" th:text="#{menu.mem.sub2.mem6}"></a></li> -->
+            </ul>
+        </li>
+    </ul>
+
+
+
+    <!--입출금 관리-->
+    <ul class="lnb5" th:fragment="banking">
+        <li class="m1">
+            <a href="bank1"><span th:text="#{menu.bank.sub1}"></span></a><span class="toggle">
+        <i th:class="${#strings.endsWith(#httpServletRequest.requestURI, 'bank1') } ? 'fa fa-minus' : 'fa fa-plus'" aria-hidden="true" ></i></span>
+            <ul class="sub_menu" th:style="${#strings.endsWith(#httpServletRequest.requestURI, 'bank1') } ? 'display:block' : 'display:none' ">
+                <li><a href="bank1" id="menu_bank1" th:text="#{menu.bank.sub1.bank1}"></a></li>
+            </ul>
+        </li>
+        <li class="m2">
+            <a href="bank31"><span th:text="#{menu.bank.sub2}"></span></a>
+            <span class="toggle">
+                <i th:class="${#strings.endsWith(#httpServletRequest.requestURI, 'bank2') || #strings.endsWith(#httpServletRequest.requestURI, 'bank31') || #strings.endsWith(#httpServletRequest.requestURI, 'bank33') || #strings.endsWith(#httpServletRequest.requestURI, 'bank41')} ? 'fa fa-minus' : 'fa fa-plus'" aria-hidden="true" ></i>
+            </span>
+        <ul class="sub_menu" th:style="${#strings.endsWith(#httpServletRequest.requestURI, 'bank2') || #strings.endsWith(#httpServletRequest.requestURI, 'bank31') || #strings.endsWith(#httpServletRequest.requestURI, 'bank33') || #strings.endsWith(#httpServletRequest.requestURI, 'bank41')} ? 'display:block' : 'display:none' ">
+            <!-- <li><a href="bank2" id="menu_bank2" th:text="#{menu.bank.sub2.bank2}"></a></li> -->
+            <li><a href="bank31" id="menu_bank31" th:text="#{menu.bank.sub2.bank31}"></a></li>
+            <li><a href="bank33" id="menu_bank33" th:text="#{menu.bank.sub2.bank33}"></a></li>
+            <li><a href="bank41" id="menu_bank41" th:text="#{menu.bank.sub2.bank41}"></a></li>
+        </ul>
+    </li>
+    </ul>
+
+
+
+    <!--게시판 관리-->
+    <ul class="lnb6" th:fragment="board">
+        <li class="m1"><a href="board1" id="menu_board1"><span th:text="#{menu.board.sub1.board1}"></span></a></li>
+        <li class="m4"><a href="/sys7"><span th:text="#{menu.sys.sys7}"></span></a></li>
+    </ul>
+
+
+
+    <!--권한 관리-->
+    <ul class="lnb7" th:fragment="authority">
+        <li class="m1">
+            <a href="auth1"><span th:text="#{menu.auth.sub1.auth1}"></span></a>
+            <ul class="sub_menu">
+                <li><a href="auth1" id="menu_auth1" th:text="|- #{menu.auth.sub1.auth1}|"></a></li>
+                <li><a href="auth3" id="menu_auth3" th:text="#{menu.auth.sub1.auth3}"></a></li>
+            </ul>
+        </li>
+        <li class="m2"><a href="auth2" id="menu_auth2"><span th:text="#{menu.auth.sub2.auth1}"></span></a></li>
+    </ul>
+
+
+
+    <!--거래 관리-->
+    <ul class="lnb4" style="display: block;" th:fragment="exchange">
+        <li class="m1"><a href="exc1" id="menu_exc1"><span th:text="#{menu.exchange.exchange1}"></span></a></li>
+        <li class="m2"><a href="exc2" id="menu_exc2"><span th:text="#{menu.exchange.exchange2}"></span></a></li>
+    </ul>
+
+
+
+</body>
+</html>

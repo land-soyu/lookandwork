@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+<title th:text="#{bank33.title}"></title>
+<th:block layout:fragment="css"></th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+    <div th:replace="include/menu :: banking"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+    <th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+    <div class="contSection" th:if="${securityYN}=='Y'">
+        <input type="hidden" id="content_member_no" th:value="${withdrawRequest.idx}"/>
+        <input type="hidden" id="mg_id" th:value="${member_proc.id}"/>
+
+            <h2 class="tit_h2"> <span th:text="#{bank33.h2}"></span>  </h2>
+            
+            <!-- 회원 정보 -->
+            <div class="tableStyle2 mb20">
+                <table>
+                    <colgroup>
+                        <col style="width: 17%;" />
+                        <col style="width: 83%;" />
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th th:text="#{bank33.content.member.no}"></th>
+                        <td th:text="${withdrawRequest.mb_no}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank33.content.member.id}"></th>
+                        <td th:text="${withdrawRequest.mb_id}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="aCenter mb40">
+                <a class="btnType" th:href="'javascript: show_member_detail_no(\'' + ${withdrawRequest.mb_id} + '\', \'' + ${withdrawRequest.mb_no} + '\')'" th:text="#{bank33.content.member.btn}"></a>
+            </div>
+            
+            <!-- 반환 출금 신청 정보 -->
+            <div class="tableStyle2 mb20">
+            	<h3 class="tit_h3" th:text="#{bank33.content.return.h3}"></h3>
+                <table>
+                    <colgroup>
+                        <col style="width: 17%;" />
+                        <col style="width: 83%;" />
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th th:text="#{bank33.content.return.date}"></th>
+                        <td th:text="${withdrawRequest.create_dt}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank33.content.return.reason}"></th>
+                        <td th:text="${withdrawRequest.return_reason}"></td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{bank33.content.return.amount}"></th>
+                        <td th:text="${#numbers.formatDecimal(withdrawRequest.return_amount, 1, 'COMMA', 4, 'POINT') + ' ' +withdrawRequest.coin_name} "></td>
+                    </tr>
+                    </tbody>
+                </table>
+        	</div>
+            
+            <!-- 지갑 주소 입력 -->
+            <div class="tableStyle2 mb20">
+            	<h3 class="tit_h3" th:text="#{bank33.content.wallet.h3}"></h3>
+                <table>
+                    <colgroup>
+                        <col style="width: 17%;" />
+                        <col style="width: 83%;" />
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th th:text="#{bank33.content.wallet.address}"></th>
+                        <td>
+                        	<span class="typeText">
+                        		<input id="return_wallet" name="return_wallet" type="text" />
+                    		</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+        	</div>
+        	
+            <div class="buttonRight">
+                <a href="javascript:popupApprove()" class="btnType" th:text="#{bank33.content.approve}"></a>
+                <a href="javascript:popupExchange()" class="btnType" th:text="#{bank33.content.exchange}"></a>
+                <a href="javascript:popupReject()" class="btnType" th:text="#{bank33.content.reject}"></a>
+                <a href="bank33" class="btnType" th:text="#{bank33.content.list.btn}"></a>
+            </div>
+            
+            </form>
+
+        </div>
+        <!-- //contSection -->
+</div>
+
+<!-- //contents -->
+<th:block layout:fragment="side">
+    <!-- 승인 팝업 -->
+    <div class="popupArea" id="approvePopup" >
+        <div class="dim"></div>
+        <div class="popupLayer">
+            <div class="popup">
+                <div class="box pop530">
+                    <form action="bank33_mod_proc_dummy?mode=approve" method="post" class="form-ajax">
+                    <input type="hidden" name="return_wallet" />
+                        <div class="popCont">
+                            <dl class="dw_regist">
+                                <dt th:text="#{bank33.content.approve}"></dt>
+                                <div class="tableStyle2 bankInfo mb20">
+                                    <table>
+                                        <colgroup>
+                                            <col style="width: 30%;" />
+                                            <col style="width: 70%;" />
+                                        </colgroup>
+                                        <tbody>
+                                            <tr>
+                                                <th th:text="#{bank33.approve.coin_name}"></th>
+                                                <td id="approvePopup_coin_name" th:text="${withdrawRequest.coin_name}"></td>
+                                            </tr>
+                                            <tr>
+                                                <th th:text="#{bank33.approve.request_address}"></th>
+                                                <td id="approvePopup_request_address" name="approvePopup_request_address" th:text="${withdrawRequest.withdraw_address}"></td>
+                                            </tr>
+                                            <tr>
+                                                <th th:text="#{bank33.approve.amount}"></th>
+                                                <input type="hidden" id="approve_amount" th:value="${withdrawRequest.return_amount}"/>                                                    
+                                                <td id="approvePopup_amount" th:text="${#numbers.formatDecimal(withdrawRequest.return_amount, 1, 'COMMA', 4, 'POINT') + ' ' +withdrawRequest.coin_name} ">                                                    
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <br>
+                                    <span th:text="#{bank33.approve.msg}"></span>
+                                </div>                          
+                            </dl>
+                        </div>
+                        <p class="popButton">
+                            <a href="javascript: toApprove();" class="popConfirm" th:text="#{bank33.approve.btn}"></a>
+                            <a href="javascript:;" class="popCancel" th:text="#{cancel.btn}"></a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- //승인 팝업 -->
+    <!-- 거래소 출금 팝업 -->
+    <div class="popupArea" id="exchangePopup" >
+        <div class="dim"></div>
+        <div class="popupLayer">
+            <div class="popup">
+                <div class="box pop530">
+                    <form action="bank33_mod_proc_dummy?mode=exchange" method="post" class="form-ajax">
+                    <input type="hidden" name="return_wallet" />
+                        <div class="popCont">
+                            <dl class="dw_regist">
+                                <dt th:text="#{bank33.content.exchange}"></dt>
+                                <div class="tableStyle2 bankInfo mb20">
+                                    <table>
+                                        <colgroup>
+                                            <col style="width: 30%;" />
+                                            <col style="width: 70%;" />
+                                        </colgroup>
+                                        <tbody>
+                                            <tr>
+                                                <th th:text="#{bank33.exchange.request_address}"></th>
+                                                <td><span class="typeText"><input id="withdraw_wallet" name="withdraw_wallet" type="text" required/></span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <br>
+                                    <span th:text="#{bank33.exchange.msg.1}"></span>
+                                    <br>
+                                    <span th:text="#{bank33.exchange.msg.2}"></span>
+                                </div>                          
+                            </dl>
+                        </div>
+                        <p class="popButton">
+                            <a href="javascript: toExchange();" class="popConfirm" th:text="#{bank33.exchange.btn}"></a>
+                            <a href="javascript:;" class="popCancel" th:text="#{cancel.btn}"></a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- //거래소 출금 팝업 -->
+    <!-- 거절 팝업 -->
+    <div class="popupArea" id="rejectPopup" >
+        <div class="dim"></div>
+        <div class="popupLayer">
+            <div class="popup">
+                <div class="box pop530">
+                    <form action="bank33_mod_proc_dummy?mode=reject" method="post" class="form-ajax">
+                        <div class="popCont">
+                            <dl class="dw_regist">
+                                <dt th:text="#{bank33.content.reject}"></dt>
+                                <div class="tableStyle2 bankInfo mb20">
+                                    <table>
+                                        <colgroup>
+                                            <col style="width: 30%;" />
+                                            <col style="width: 70%;" />
+                                        </colgroup>
+                                        <tbody>
+                                            <tr>
+                                                <th th:text="#{bank33.reject.reason}"></th>
+                                                <td><span class="typeText"><input id="reject_reason" type="text" required/></span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>                          
+                            </dl>
+                        </div>
+                        <p class="popButton">
+                            <a href="javascript: toReject();" class="popConfirm" th:text="#{bank33.reject.btn}"></a>
+                            <a href="javascript:;" class="popCancel" th:text="#{cancel.btn}"></a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- //거절 팝업 -->
+</th:block>
+
+<th:block layout:fragment="script">\
+	<link rel="stylesheet" href="/css/bank.css"/>
+    <script type="text/javascript" src="/js/rsa/rsa.js"></script>
+    <script type="text/javascript" src="/js/rsa/jsbn.js"></script>
+    <script type="text/javascript" src="/js/rsa/prng4.js"></script>
+    <script type="text/javascript" src="/js/rsa/rng.js"></script>
+    <script type="text/javascript" src="/js/banking/bank33.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var IMPORT_REQUESTFAIL = [[#{import.requestfail}]];
+        var BANK33_ALERT_INPUT_RETURN_ADDRESS = [[#{bank33.alert.input_return_address}]];
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

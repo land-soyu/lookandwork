@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+<title th:text="#{mem17.title}"></title>
+<th:block layout:fragment="css">
+    <link rel="stylesheet" href="/css/datepicker.min.css"/>
+</th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+    <div th:replace="include/menu :: member"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+    <th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+    <div class="contSection" th:if="${securityYN}=='Y'">
+        <h2 class="tit_h2" th:text="#{mem17.h2}"></h2>
+        <form action="mem17" method="get" name="search_log_form" id="search_log_form">
+            <input type="hidden" name="page" id="page" th:value="${page}" />
+            <input type="hidden" name="total" id="total" th:value="${memberLoginHisResponse.total_memberLoginHis_count}">
+            <div class="tableStyle2 memInfo mb20">
+                <table>
+                    <colgroup>
+                        <col style="width: 17%;" />
+                        <col style="width: 33%;" />
+                        <col style="width: 17%" />
+                        <col style="width: 33%" />
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th th:text="#{mem6.table.th.id}"></th>
+                        <td class="full_input"><span class="typeText"><input type="text" name="mb_id" id="mb_id" th:value="${mb_id}" th:placeholder="#{mem6.table.td.id}" /></span></td>
+                        <th th:text="#{date} + ' *'"></th>
+                        <td>
+                            <p class="dateChoice">
+                                <span>
+                                    <img src="/images/calendar_icon.png" alt="날짜선택" />
+                                    <input id="search_reg_dt" name="search_reg_dt" type="text" class="datepicker-here" data-range="true" data-multiple-dates-separator=" - " th:data-language="${#locale}" placeholder="YYYY.MM.DD - YYYY.MM.DD" th:value="${search_reg_dt != null} ? ${search_reg_dt} : ''" />
+                                </span>
+                            </p>
+                            <a href="javascript: setDateChoiceChange(1);"  class="dateSelectBtn" th:text="#{date.select.btn.1}"></a>
+                            <a href="javascript: setDateChoiceChange(2);"  class="dateSelectBtn" th:text="#{date.select.btn.2}"></a>
+                            <a href="javascript: setDateChoiceChange(3);"  class="dateSelectBtn" th:text="#{date.select.btn.3}"></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{mem17.login.yn} + ' *'"></th>
+                        <td class="full_input">
+                            <span class="typeSelect">
+                                <select name="login_yn">
+                                    <option value="ALL" th:selected="${login_yn == 'ALL'}" th:text="#{all}"></option>
+                                    <option value="Y" th:selected="${login_yn == 'Y'}" th:text="'Y'"></option>
+                                    <option value="N" th:selected="${login_yn == 'N'}" th:text="'N'"></option>
+                                </select>
+                            </span>
+                        </td>
+                        <th th:text="#{mem17.login.reg.ip}"></th>
+                        <td class="full_input"><span class="typeText"><input type="text" name="login_reg_ip" id="login_reg_ip" th:value="${login_reg_ip}" th:placeholder="#{mem17.login.reg.ip}" /></span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="buttonRight mb50">
+                <a href="javascript:;" class="btnType" id="search_log_btn" th:text="#{search.btn}"></a>
+            </div>
+            <div class="listCountWrap">
+                <h3 class="tit_h3" th:if="${#locale.toString()} == 'ko'" th:text="#{cnt.search} + ' ' + ${memberLoginHisResponse.total_memberLoginHis_count}  + #{cnt}"></h3>
+                <h3 class="tit_h3" th:if="${#locale.toString()} == 'en'" th:text="${memberLoginHisResponse.total_memberLoginHis_count} + ' ' + #{cnt.search}"></h3>
+                <span class="typeSelect">
+                    <select name="search_listCount" id="searchListCount">
+                        <option value="10" th:selected="${search_listCount == 10}">10</option>
+                        <option value="20" th:selected="${search_listCount == 20}">20</option>
+                        <option value="50" th:selected="${search_listCount == 50}">50</option>
+                        <option value="100" th:selected="${search_listCount == 100}">100</option>
+                    </select>
+                </span>
+            </div>
+        </form>
+        <div class="tableStyle aCenter head2 font13 mb20">
+            <table>
+                <colgroup>
+                    <col style="width: 3%;" />
+                    <col style="width: 10%;" />
+                    <col style="width: 5%;" />
+                    <col style="width: 10%;" />
+                    <col style="width: 26%;" />
+                    <col style="width: 4%;" />
+                    <col style="width: 10%;" />
+                    <col style="width: 10%;" />
+                    <col style="width: 8%;" />
+                    <col style="width: 6%;" />
+                </colgroup>
+                <thead>
+                <tr>
+                    <th th:text="#{number}"></th>
+                    <th th:text="#{member.id}"></th>
+                    <th th:text="#{mem17.oauth.result.code}"></th>
+                    <th th:text="#{mem17.oauth.result.msg}"></th>
+                    <th th:text="#{mem17.login.agent}"></th>
+                    <th th:text="#{mem17.login.block.yn}"></th>
+                    <th th:text="#{mem17.login.reg.dt}"></th>
+                    <th th:text="#{mem17.login.reg.ip}"></th>
+                    <th th:text="#{mem17.login.user.os}"></th>
+                    <th th:text="#{mem17.login.user.browser}"></th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.size(memberLoginHisResponse.memberLoginHisList)} > 0" th:each="list : ${memberLoginHisResponse.memberLoginHisList}" >
+                        <td th:text="${list.login_no}"></td>
+                        <td th:text="${list.mb_id}"></td>
+                        <td th:text="${list.oauth_result_code}"></td>
+                        <td th:text="${list.oauth_result_msg}"></td>
+                        <td th:text="${list.login_agent}"></td>
+                        <td th:text="${list.login_block_yn}"></td>
+                        <td>
+                            <span th:text="${#dates.format(list.login_reg_dt, 'yyyy-MM-dd HH:mm:ss')}"></span><br/>
+                            <span th:text="'(' + ${#dates.format(list.KST_login_reg_dt, 'yyyy-MM-dd HH:mm:ss')} + ')'"></span>
+                        </td>
+                        <!--<td th:text="${#dates.format(list.login_reg_dt, 'yyyy-MM-dd HH:mm:ss')}"></td>-->
+                        <td th:text="${list.login_reg_ip}"></td>
+                        <td th:text="${list.login_user_os}"></td>
+                        <td th:text="${list.login_user_browser}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pageFoot inPaging">
+            <div class="paging">
+                <a href="javascript: goPage('1', '#search_log_form');" class="prevBt"></a>
+                <a th:if="${memberLoginHisResponse.pageNaviResponse.isPrev == 1}" href="javascript: goPrePage('#search_log_form');" class="beforeBt"></a>
+                <a th:if="${memberLoginHisResponse.pageNaviResponse.isPrev != 1}" href="javascript:;" class="beforeBt"></a>
+                <ul th:each="index: ${#numbers.sequence(memberLoginHisResponse.pageNaviResponse.decadeFirst, memberLoginHisResponse.pageNaviResponse.decadeLast)}">
+                    <li th:class="${memberLoginHisResponse.pageNaviResponse.current_page == index ? 'on' : ''}"><a th:href="@{'javascript: goPage(' + ${index} + ', \'#search_log_form\');'}" th:text="${index}"></a></li>
+                </ul>
+                <a th:if="${memberLoginHisResponse.pageNaviResponse.isNext == 1}" href="javascript: goNextPage('#search_log_form');" class="afterBt"></a>
+                <a th:if="${memberLoginHisResponse.pageNaviResponse.isNext != 1}" href="javascript:;" class="afterBt"></a>
+                <a th:href="@{'javascript: goPage(' + ${memberLoginHisResponse.pageNaviResponse.lastPage} + ', \'#search_log_form\');'}" href="javascript: goPage();" class="nextBt"></a>
+            </div>
+        </div>
+    </div>
+    <!-- //contSection -->
+</div>
+<!-- //contents -->
+<th:block layout:fragment="side"></th:block>
+<th:block layout:fragment="script">
+    <script type="text/javascript" src="/js/datepicker.min.js"></script>
+    <script type="text/javascript" src="/js/i18n/datepicker.ko.js"></script>
+    <script type="text/javascript" src="/js/i18n/datepicker.en.js"></script>
+    <script type="text/javascript" src="/js/include/menu_member.js"></script>
+    <script type="text/javascript" src="/js/member/mem17.js"></script>
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var lang = [[${#locale}]];
+        console.log(lang);
+
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

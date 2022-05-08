@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+<title th:text="#{board1.title}"></title>
+<th:block layout:fragment="css"></th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+    <div th:replace="include/menu :: board"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+    <th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+    <div class="contSection" th:if="${securityYN}=='Y'">
+        <h2 class="tit_h2" th:text="#{board1.h2}"></h2>
+        <form action="board1" method="post" name="search_notice_form" id="search_notice_form">
+            <input type="hidden" name="page" id="page" th:value="${page}" />
+            <input type="hidden" name="totalPage" id="totalPage" th:value="${noticeResponse.total_notice_count}" />
+            <div class="tableStyle2 boardStyle mb20">
+                <table>
+                    <colgroup>
+                        <col style="width: 17%;" />
+                        <col style="width: 33%;" />
+                        <col style="width: 17%;" />
+                        <col style="width: 33%;" />
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th th:text="#{status.exhibition} + ' *'"></th>
+                        <td>
+                            <input type="radio" name="search_type" id="search_type_all" value="all" th:checked="${search_type == 'all'}"><label for="search_type_all" th:text="#{all}"></label>
+                            <input type="radio" name="search_type" id="search_type_y" value="Y" th:checked="${search_type == 'Y'}"><label for="search_type_y" th:text="#{public}"></label>
+                            <input type="radio" name="search_type" id="search_type_n" value="N" th:checked="${search_type == 'N'}"><label for="search_type_n" th:text="#{private}"></label>
+                        </td>
+                        <th th:text="#{language}  + ' *'"></th>
+                        <td class="typeSelect">
+                            <select name="search_lang" id="search_lang">
+                                <option value="all" th:selected="${search_lang == 'all'}" th:text="#{all}"></option>
+                                <option value="ko" th:selected="${search_lang == 'ko'}" th:text="#{language.ko}"></option>
+                                <option value="en" th:selected="${search_lang == 'en'}" th:text="#{language.en}"></option>
+                                <option value="zh" th:selected="${search_lang == 'zh'}" th:text="#{language.zh}"></option>
+                                <option value="ja" th:selected="${search_lang == 'ja'}" th:text="#{language.ja}"></option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{search.content}"></th>
+                        <td colspan="3"><span class="typeText"><input type="text" name="search_content" id="search_content" th:value="${search_content}" th:placeholder="#{input.search.content}" /></span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="buttonRight mb50">
+                <a href="javascript:;" class="btnType" id="search_notice_btn" th:text="#{search.btn}"></a>
+            </div>
+            <div class="listCountWrap">
+                <h3 class="tit_h3" th:if="${#locale.toString()} == 'ko'" th:text="#{cnt.search} + ' ' + ${noticeResponse.total_notice_count}  + #{cnt}"></h3>
+                <h3 class="tit_h3" th:if="${#locale.toString()} == 'en'" th:text="${noticeResponse.total_notice_count} + ' ' + #{cnt.search}"></h3>
+                <span>
+                    <a th:if="${member_proc.role != 4}" href="board1_mod?mode=modify" class="btnType" th:text="#{add.btn}">신규등록</a>
+                    <span class="countSelect">
+                        <select name="search_listCount" id="searchListCount">
+                            <option value="10" th:selected="${search_listCount == 10}">10</option>
+                            <option value="20" th:selected="${search_listCount == 20}">20</option>
+                            <option value="50" th:selected="${search_listCount == 50}">50</option>
+                            <option value="100" th:selected="${search_listCount == 100}">100</option>
+                        </select>
+                    </span>
+                </span>
+            </div>
+        </form>
+        <div class="tableStyle boardStyle aCenter mb20">
+            <table>
+                <colgroup>
+                    <col style="width: 4%;" />
+                    <col style="width: 8%;" />
+                    <col style="width: 8%;" />
+                    <col style="width: 8%;" />
+                    <col style="" />
+                    <col style="width: 17%;" />
+                    <col style="width: 10%;" />
+                    <col style="width: 10%;" />
+                </colgroup>
+                <thead>
+                <tr>
+                    <td class="listCheck"><input type="checkbox" id="checkNo_all"><label for="checkNo_all"><span class="hide" th:text="#{select}"></span></label></td>
+                    <th th:text="#{board1.table.th.no}"></th>
+                    <th th:text="#{board1.write.table.th.kind}"></th>
+                    <th th:text="#{language}"></th>
+                    <th th:text="#{title}"></th>
+                    <th th:text="#{last.modified.date}"></th>
+                    <th th:text="#{status}"></th>
+                    <th th:text="#{views}"></th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="notice : ${noticeResponse.noticeList}">
+                        <td class="listCheck"><input type="checkbox" name="checkNo" th:id="'checkNo_' + ${notice.no}" th:value="${notice.no}"><label th:for="|checkNo_| + ${notice.no}"><span class="hide" th:text="#{select}"></span></label></td>
+                        <td th:text="${notice.no}"></td>
+                        <td>
+                            <span th:if="${notice.type == 'noti'}" th:text="#{board1.write.table.th.kind.notice}"></span>
+                            <span th:if="${notice.type == 'event'}" th:text="#{board1.write.table.th.kind.event}"></span>
+                        </td>
+                        <td>
+                            <span th:if="${notice.lang == 'en'}" th:text="#{language.en}"></span>
+                            <span th:if="${notice.lang == 'ko'}" th:text="#{language.ko}"></span>
+                            <span th:if="${notice.lang == 'zh'}" th:text="#{language.zh}"></span>
+                            <span th:if="${notice.lang == 'ja'}" th:text="#{language.ja}"></span>
+                        </td>
+                        <td class="title"><a th:href="@{'board1_mod?no=' + ${notice.no}}" th:text="${notice.title}"></a></td>
+                        <td th:text="${#dates.format(notice.mod_dt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                        <td>
+                            <span th:if="${notice.is_secret == 'Y'}" th:text="#{public}"></span>
+                            <span th:if="${notice.is_secret == 'N'}" th:text="#{private}"></span>
+                        </td>
+                        <td th:text="${notice.read_count}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="buttonRight">
+            <a th:if="${member_proc.role != 4}" href="javascript: deleteNotice();" class="btnType" th:text="#{delete.btn}"></a>
+        </div>
+        <div class="pageFoot inPaging">
+            <div class="paging">
+                <a href="javascript: goPage('1', '#search_notice_form');" class="prevBt"></a>
+                <a th:if="${noticeResponse.pageNaviResponse.isPrev == 1}" href="javascript: goPrePage('#search_notice_form');" class="beforeBt"></a>
+                <a th:if="${noticeResponse.pageNaviResponse.isPrev != 1}" href="javascript:;" class="beforeBt"></a>
+                <ul th:each="index: ${#numbers.sequence(noticeResponse.pageNaviResponse.decadeFirst, noticeResponse.pageNaviResponse.decadeLast)}">
+                    <li th:class="${noticeResponse.pageNaviResponse.current_page == index ? 'on' : ''}"><a th:href="@{'javascript: goPage(' + ${index} + ', \'#search_notice_form\');'}" th:text="${index}"></a></li>
+                </ul>
+                <a th:if="${noticeResponse.pageNaviResponse.isNext == 1}" href="javascript: goNextPage('#search_notice_form');" class="afterBt"></a>
+                <a th:if="${noticeResponse.pageNaviResponse.isNext != 1}" href="javascript:;" class="afterBt"></a>
+                <a th:href="@{'javascript: goPage(' + ${noticeResponse.pageNaviResponse.lastPage} + ', \'#search_notice_form\');'}" href="javascript: goPage();" class="nextBt"></a>
+            </div>
+        </div>
+    </div>
+    <!-- //contSection -->
+</div>
+<!-- //contents -->
+<th:block layout:fragment="side"></th:block>
+<th:block layout:fragment="script">
+<script type="text/javascript" src="/js/include/menu_board.js"></script>
+<script type="text/javascript" src="/js/board/board1.js"></script>
+<script type="text/javascript" th:inline="javascript">
+/*<![CDATA[*/
+/* 알림창 메세지 가져오기 */
+function getMessage(index) {
+
+    var message = '';
+
+    switch (index) {
+        case 1:
+            message = [[#{nothing.selected}]];
+            break;
+        case 2:
+            message = [[#{board1.alert.text.select_delete}]];
+            break;
+        default:
+            break;
+    }
+
+    return message;
+}
+/*]]>*/
+</script>
+</th:block>
+</body>
+</html>

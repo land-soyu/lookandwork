@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+<title>시스템관리&gt;입출금관리&gt;자동출금</title>
+<th:block layout:fragment="css"></th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+    <div th:replace="include/menu :: system"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+    <th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+    <div class="contSection" th:if="${securityYN}=='Y'">
+        <h2 class="tit_h2">입출금관리 - 자동출금</h2>
+
+        <p class="topButton">
+            <a href="javascript:void(0);" class="btnType">수정</a>
+            <a href="javascript:void(0);" class="btnType" id="import">Import</a>
+        </p>
+
+        <div class="tableStyle aCenter inputArea mb20">
+            <table>
+                <colgroup>
+                    <col style="width: 4%;" />
+                    <col style="width: 10%;" />
+
+                    <col style="width:14.33%" />
+                    <col style="width:14.33%" />
+                    <col style="width:14.33%" />
+                    <col style="width:14.33%" />
+                    <col style="width:14.33%" />
+
+                    <col style="width:14.33%" />
+                </colgroup>
+                <thead>
+                <tr>
+                    <th colspan="2">구분</th>
+
+                    <th>Level 1</th>
+                    <th>Level 2</th>
+                    <th>Level 3</th>
+                    <th>Level 4</th>
+                    <th>Level 5</th>
+
+                    <th>VIP</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td colspan="2">최초 입금 시간 (분)</td>
+
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                </tr>
+                <tr>
+                    <td rowspan="3">거래<br />기록</td>
+                    <td>거래횟수(회)</td>
+
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이하</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                </tr>
+                <tr>
+                    <td>30일간 거래량(원)</td>
+
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이하</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                </tr>
+                <tr>
+                    <td>총 보유 자산(원)</td>
+
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이하</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                </tr>
+
+                <tr>
+                    <td rowspan="4">인출<br />요청</td>
+                    <td>당일 요청 횟수(회)</td>
+
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이하</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                </tr>
+                <tr>
+                    <td>당일 요청 금액<br />(환산가)</td>
+
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이하</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                </tr>
+                <tr>
+                    <td>1주간 요청 횟수(회)</td>
+
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이하</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                </tr>
+                <tr>
+                    <td>1주간 요청 금액<br />(환산가)</td>
+
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이하</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+
+                    <td><p class="systemBox4"><span class="typeText"><input type="text" placeholder="숫자 입력" /></span><mark>이상</mark></p></td>
+                </tr>
+
+                <tr>
+                    <td rowspan="7">1회<br />최대<br />금액</td>
+                    <td>KRW(원)</td>
+
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>BTC</td>
+
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>ETH</td>
+
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>LTC</td>
+
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>ETC</td>
+
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>XRP</td>
+
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>ZEC</td>
+
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+
+                    <td>
+                        <p class="systemBox5">
+                                    <span class="typeSelect">
+                                        <select>
+                                            <option>보유량%</option>
+                                            <option>무제한</option>
+                                            <option>정액</option>
+                                        </select>
+                                    </span>
+                            <span class="typeText"><input type="text" placeholder="숫자" /></span><mark>이하</mark>
+                        </p>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="buttonRight">
+            <a href="javascript:void(0);" class="btnType">취소</a>
+        </div>
+    </div>
+    <!-- //contSection -->
+</div>
+<!-- //contents -->
+<th:block layout:fragment="side"></th:block>
+<th:block layout:fragment="script">
+    <script type="text/javascript" src="/js/include/menu_system.js"></script>
+    <script type="text/javascript" src="/js/system/sys5.js"></script>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+	<title th:text="#{sys1.title}"></title>
+	<th:block layout:fragment="css">
+
+	</th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+	<div th:replace="include/menu :: system"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+	<th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+	<div class="contSection" th:if="${securityYN}=='Y'">
+		<h2 class="tit_h2" th:text="#{sys1.h2}"></h2>
+		<p class="topButton" th:if="${mode} == 'modify'">
+			<a href="javascript:checkImport();" class="btnType" th:text="#{import.btn}"></a>
+		</p>
+        <p class="topButton" th:unless="${mode} == 'modify'">
+            <a href="javascript:checkModify()" class="btnType" th:if="${member_proc.role == 0}" th:text="#{modify.btn}"></a>
+        </p>
+		<div class="tableStyle aCenter inputArea mb20">
+			<table>
+				<colgroup>
+					<col style="width: 33%;" />
+					<col style="width: 33%;" />
+					<col style="width: 33%;" />
+				</colgroup>
+				<thead>
+				<tr>
+					<th th:text="#{sys1.table.thead.th.invest_fee}"></th>
+					<th th:text="#{sys1.table.thead.th.recover_max30}"></th>
+					<th th:text="#{sys1.table.thead.th.recover_min30}"></th>
+				</tr>
+				</thead>
+
+				<tbody>
+					<tr th:if="${#lists.size(systemFee)} > 0" th:each="fee,iter : ${systemFee}">						
+						<td>
+							<p class="systemBox2"  th:if="${mode} == 'modify'">
+								<span class="typeText"><input title="" type="text" th:id="invest_fee_ + ${iter.index}" th:value="${#numbers.formatDecimal(fee.invest_fee, 1, 'COMMA', 2, 'POINT')}" onchange="numberWithCommas(this.value, this, null, 0.00, 100, 2)" onkeypress="return isNumberKey(event)"/></span><mark>%</mark>
+							</p>
+                            <p class="systemBox2"  th:unless="${mode} == 'modify'">
+                                <span class="typeText" th:text="${#numbers.formatDecimal(fee.invest_fee, 1, 'COMMA', 2, 'POINT')} + ' %'"></span>
+                            </p>
+						</td>						
+						<td>
+							<p class="systemBox2"  th:if="${mode} == 'modify'">
+								<span class="typeText"><input title="" type="text" th:id="recover_max30_ + ${iter.index}" th:value="${#numbers.formatDecimal(fee.recover_max30, 1, 'COMMA', 2, 'POINT')}" onchange="numberWithCommas(this.value, this, null, 0.00, 100, 2)" onkeypress="return isNumberKey(event)"/></span><mark>%</mark>
+							</p>
+                            <p class="systemBox2"  th:unless="${mode} == 'modify'">
+                                <span class="typeText" th:text="${#numbers.formatDecimal(fee.recover_max30, 1, 'COMMA', 2, 'POINT')} + ' %'"></span>
+                            </p>
+						</td>						
+						<td>
+							<p class="systemBox2"  th:if="${mode} == 'modify'">
+								<span class="typeText"><input title="" type="text" th:id="recover_min30_ + ${iter.index}" th:value="${#numbers.formatDecimal(fee.recover_min30, 1, 'COMMA', 2, 'POINT')}" onchange="numberWithCommas(this.value, this, null, 0.00, 100, 2)" onkeypress="return isNumberKey(event)"/></span><mark>%</mark>
+							</p>
+                            <p class="systemBox2"  th:unless="${mode} == 'modify'">
+                                <span class="typeText" th:text="${#numbers.formatDecimal(fee.recover_min30, 1, 'COMMA', 2, 'POINT')} + ' %'"></span>
+                            </p>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="buttonRight" th:if="${mode} == 'modify'">
+			<a href="sys1" class="btnType" id="cancel" th:text="#{cancel.btn}"></a>
+		</div>
+	</div>
+	<!-- //contSection -->
+</div>
+
+<th:block layout:fragment="script">
+	<script type="text/javascript" src="/js/include/menu_system.js"></script>
+	<script type="text/javascript" src="/js/system/sys1.js"></script>
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var STR_Q_IMPORT = [[#{import.message}]];
+        var STR_Q_MODIFY = [[#{sys1.q.modify}]];
+        var STR_NOT_ENOUGH_PARAMS =[[#{import.notenoughparams}]];
+        var STR_REQUEST_FAIL=[[#{import.requestfail}]];
+        var STR_REQUEST_SUCCESS=[[#{import.reuqestsuccess}]];
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout_mod">
+<head>
+    <title th:text="#{sys7.title}"></title>
+    <th:block layout:fragment="css">
+        <link rel="stylesheet" href="/css/datepicker.min.css"/>
+        <style>
+            th {text-align: center;}
+        </style>
+    </th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+    <div th:replace="include/menu :: board"></div>
+    <!--<div th:replace="include/menu_system :: system"></div>-->
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+    <th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+    <div class="contSection" th:if="${securityYN}=='Y'">
+        <h2 class="tit_h2" th:text="#{sys7.h2}"></h2>
+        <div class="buttonRight mb20">
+            <a class="btnType" href="javascript: addBanner(1);" th:text="#{add.btn}"></a>
+        </div>
+        <div class="tableStyle dealingsInfo aCenter font13 head2 mb20 fitTable">
+            <table>
+                <colgroup>
+                    <col width="5%"/>
+
+                    <col width="25%"/>
+                    <col width="20%"/>
+                    <col width="20%"/>
+
+                    <col width="8%"/>
+                    <col width="8%"/>
+                    <col width="14%"/>
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th th:text="#{number}"></th>
+                        <th th:text="#{sys7.attach.en.name}"></th>
+                        <th th:text="#{sys7.attach.move.en.url}"></th>
+                        <th th:text="#{sys7.text.en.1}"></th>
+                        <th th:text="#{sys7.start.dt}"></th>
+                        <th th:text="#{sys7.end.dt}"></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody th:each="bannerInfo : ${topList}" th:if="${topList}">
+                    <tr>
+                        <td rowspan="2" th:text="${bannerInfo.no}"></td>
+                        <td th:text="${bannerInfo.attach_name_en}"></td>
+                        <td th:text="${bannerInfo.link_url_en}"></td>
+                        <td th:text="${bannerInfo.text1_en}"></td>
+                        <td th:text="${#dates.format(bannerInfo.start_dt, 'yyyy-MM-dd')}"></td>
+                        <td th:text="${#dates.format(bannerInfo.end_dt, 'yyyy-MM-dd')}"></td>
+                        <td>
+                            <a th:href="'javascript: modifyBanner(' + ${bannerInfo.no} + ');'" class="tableButton" th:text="#{modify.btn}" style="text-decoration: none; min-width: 55px;"></a>
+                            <a th:href="'javascript: deleteBanner(' + ${bannerInfo.no} + ', \'' + ${bannerInfo.attach_name} + '\');'" class="tableButton" th:text="#{delete.btn}" style="text-decoration: none; min-width: 55px;"></a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- //contSection -->
+</div>
+<th:block layout:fragment="side">
+    <!-- finalConfirm --> <!--TODO 팝업이 있습니다-->
+    <div class="popupArea" id="addConfirm" style="display: none; overflow-y: auto;">
+        <div class="dim"></div>
+        <div class="popupLayer">
+            <div class="popup">
+                <div class="box 430" style="max-width: 900px;">
+                    <form name="banner_add_form" id="banner_add_form" action="javascript:;">
+                        <input type="hidden" name="no" id="no" value="" />
+                        <p class="popTit" th:text="#{add.btn}"></p>
+                        <div class="popCont">
+                            <dl class="fc-elem" style="display: none;">
+                                <dd>
+                                    <input type="radio" name="type" id="type_1" value="1" checked="checked">
+                                    <label for="type_1" th:text="#{sys7.h3.banner.top}"></label>
+                                </dd>
+                            </dl>
+                            <dl class="fc-elem">
+                                <dt th:text="#{sys7.start.dt}"></dt>
+                                <dd>
+                                    <span class="dateChoicePopup marginTop0" style="margin-top: 0;">
+										<img src="/images/calendar_icon.png">
+										<input id="start_dt" name="start_dt" type="text" class="datepicker-here" data-language="ko" placeholder="YYYY.MM.DD" readonly>
+									</span>
+                                </dd>
+                            </dl>
+                            <dl class="fc-elem">
+                                <dt th:text="#{sys7.end.dt}"></dt>
+                                <dd>
+                                    <span class="dateChoicePopup marginTop0" style="margin-top: 0;">
+										<img src="/images/calendar_icon.png">
+										<input id="end_dt" name="end_dt" type="text" class="datepicker-here" data-language="ko" placeholder="YYYY.MM.DD" readonly>
+									</span>
+                                </dd>
+                            </dl>
+<!--                            <dl class="fc-elem">-->
+<!--                                <dt th:text="#{sys7.attach.upload}"></dt>-->
+<!--                                <dd>-->
+<!--                                    <span class="typeText">-->
+<!--                                        <input type="file" name="attach_name" id="attach_name" value=""/>-->
+<!--                                        <span id="attach_name_view" style="display: none;"/>-->
+<!--                                    </span>-->
+<!--                                </dd>-->
+<!--                            </dl>-->
+                            <dl class="fc-elem">
+                                <dt th:text="#{sys7.attach.en.upload}"></dt>
+                                <dd>
+                                    <span class="typeText">
+                                        <input type="file" name="attach_name_en" id="attach_name_en" value=""/>
+                                        <span id="attach_name_view_en" style="display: none;"/>
+                                    </span>
+                                </dd>
+                            </dl>
+<!--                            <dl class="fc-elem">-->
+<!--                                <dt th:text="#{sys7.attach.move.url}"></dt>-->
+<!--                                <dd>-->
+<!--                                    <span class="typeText">-->
+<!--                                        <input type="text" name="link_url" id="link_url" th:placeholder="#{sys7.attach.move.url}"/>-->
+<!--                                    </span>-->
+<!--                                </dd>-->
+<!--                            </dl>-->
+                            <dl class="fc-elem">
+                                <dt th:text="#{sys7.attach.move.en.url}"></dt>
+                                <dd>
+                                    <span class="typeText">
+                                        <input type="text" name="link_url_en" id="link_url_en" th:placeholder="#{sys7.attach.move.url}"/>
+                                    </span>
+                                </dd>
+                            </dl>
+<!--                            <dl class="fc-elem">-->
+<!--                                <dt th:text="#{sys7.text.ko.1}"></dt>-->
+<!--                                <dd>-->
+<!--                                    <span class="typeText">-->
+<!--                                        <textarea id="summernote" name="text1_ko"></textarea>-->
+<!--                                    </span>-->
+<!--                                </dd>-->
+<!--                            </dl>-->
+                            <dl class="fc-elem">
+                                <dt th:text="#{sys7.text.en.1}"></dt>
+                                <dd>
+                                    <span class="typeText">
+                                        <textarea id="summernote2" name="text1_en"></textarea>
+                                    </span>
+                                </dd>
+                            </dl>
+                        </div>
+                    </form>
+                    <p class="popButton">
+                        <a href="javascript: addProc();" class="popConfirm" id="addPopBtn" th:text="#{add.btn}"></a>
+                        <a href="javascript: modifyProc();" class="popConfirm" id="modifyPopBtn" th:text="#{modify.btn}" style="display: none;"></a>
+                        <a href="javascript:void(0);" class="popCancel" th:text="#{cancel.btn}"></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- //finalConfirm -->
+</th:block>
+<th:block layout:fragment="script">
+    <script type="text/javascript" src="/js/datepicker.min.js"></script>
+    <script type="text/javascript" src="/js/i18n/datepicker.ko.js"></script>
+    <script type="text/javascript" src="/js/i18n/datepicker.en.js"></script>
+    <script type="text/javascript" src="/js/include/menu_system.js"></script>
+    <script type="text/javascript" src="/js/system/sys7.js"></script>
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var ALERT_MSG_1 = [[#{sys7.alert.msg.1}]];
+        var ALERT_MSG_2 = [[#{sys7.alert.msg.2}]];
+        var ALERT_MSG_3 = [[#{sys7.alert.msg.3}]];
+        var ALERT_MSG_4 = [[#{sys7.alert.msg.4}]];
+        var DATEPICKER_ALERT_1 = [[#{datepicker.alert.1}]];
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

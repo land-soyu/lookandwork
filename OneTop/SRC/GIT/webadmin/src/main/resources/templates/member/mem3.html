@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+<title th:text="#{mem4.title}"></title>
+<th:block layout:fragment="css"></th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+    <div th:replace="include/menu :: member"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+        <th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+        <div class="contSection adminPayBack" th:if="${securityYN}=='Y'">
+        <h2 class="tit_h2" th:text="#{menu.mem.sub4.mem3}"></h2>
+        <form action="javascript:;" name="payment_repayment_form" id="payment_repayment_form" method="post">
+            <input type="hidden" name="select_member" id="select_member" value="all" />
+            <input type="hidden" name="modulus" id="modulus" th:value="${modulus}">
+            <input type="hidden" name="exponent" id="exponent" th:value="${exponent}">
+            <div class="tableStyle2 mb20 ">
+                <table>
+                    <colgroup>
+                        <col style="width: 20%;" />
+                        <col style="width: 80%;" />
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th th:text="#{mem4.select_member} + ' *'"></th>
+                        <td>
+                            <dl class="targetUserSel">
+                                <dd>
+                                    <div class="inputArea">
+                                        <input type="radio" name="userSelect" id="userAll" value="all" checked><label for="userAll" th:text="#{mem4.all_member}"></label>
+                                    </div>
+                                </dd>
+                                <dd>
+                                    <div class="inputArea">
+                                        <input type="radio" name="userSelect" id="exel" value="excel"><label for="exel" th:text="#{mem4.excel_member}"></label>
+                                    </div>
+                                    <div class="hiddenArea">
+                                        <span class="typeText"><input type="text" id="attach_file_name" value="" readonly />
+                                        <input type="file" th:value="#{mem4.excelBtn}" id="csvFile"/><label for="csvFile" class="searchBtb" th:text="#{mem4.excelBtn}"></label>
+                                        </span>
+                                        <span>
+                                            <span id="select_total">0</span>&nbsp;<span th:text="#{mem4.excel_message.1}"></span>&nbsp;<span id="select_exist">0</span>&nbsp;<span th:text="#{mem4.excel_message.2}"></span>
+                                        </span>
+                                    </div>
+                                </dd>
+                            </dl>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{mem4.payment_repayment} + ' *'"></th>
+                        <td>
+                            <dl class="payAndBack">
+                                <dd>
+                                    <div class="top" th:text="#{mem4.coin_select}"></div>
+                                    <div class="bottom">
+                                        <!--
+                                        <span class="typeSelect">
+                                            <select name="coin_name" id="coin_name">
+                                                <option th:each="coinInfo : ${coinInfoList}" th:value="${coinInfo.coin_name}" th:text="${coinInfo.coin_name}"></option>
+                                            </select>
+                                        </span>
+                                        -->
+                                        <span class="typeSelect">
+                                            <select name="pr_type" id="pr_type">
+                                                <option value="0" selected th:text="#{payments}"></option>
+                                                <option value="1" th:text="#{recovery}"></option>
+                                            </select>
+                                        </span>
+                                    </div>
+                                </dd>
+                                <dd id="coin_quantity_field">
+                                    <div class="top">
+                                        <span id="pr_type_name" th:text="#{amount}"></span>
+                                    </div>
+                                    <div class="bottom">
+                                        <span class="typeText">
+                                            <input type="text" name="coin_quantity" id="coin_quantity" value="" onchange="numberWithCommas(this.value, this, null, 0.00000000, 9999999999999999.99999999, 8)" onkeypress="return isNumberKey(event)" />
+                                        </span>
+                                    </div>
+                                </dd>
+                                <dd>
+                                    <div class="top">
+                                        <span id="pr_type_name2" th:text="#{mem4.content}"></span>
+                                    </div>
+                                    <div class="bottom">
+                                        <span class="typeSelect">
+                                            <select name="content_type" id="content_type">
+                                                <option value="0" th:text="#{cost}"></option>
+                                                <option value="1" th:text="#{sales}"></option>
+                                                <option value="2" th:text="#{etc}"></option>
+                                                <option value="3" th:text="#{mem4.content_type_3}"></option>
+                                            </select>
+                                            <span class="typeText">
+                                                <input type="text" name="content" id="content" value="" maxlength="30"/>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </dd>
+                                <dd>
+                                    <div class="top">
+                                        <span th:text="#{manager}"></span>&nbsp;:&nbsp;<span class="adminId" th:text="${member_proc.id}"></span>
+                                    </div>
+                                </dd>
+                            </dl>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="buttonRight">
+                <a href="javascript: totalMemeberPop();" class="btnType color" th:text="#{mem4.nextBtn}"></a> <a href="javascript:location.reload();;" class="btnType" th:text="#{cancel.btn}"></a>
+            </div>
+            <div class="pageFoot mb50">
+                <ul class="footList">
+                    <li th:text="#{mem6.footer.message1}"></li>
+                    <li th:text="#{mem4.footer.message1}"></li>
+                </ul>
+            </div>
+        </form>
+    </div>
+    <!-- //contSection -->
+</div>
+<!-- //contents -->
+<th:block layout:fragment="side">
+    <!-- userSearch --><!--TODO 팝업이 있습니다-->
+    <div class="popupArea" id="userSearch" style="display: none;">
+        <div class="dim"></div>
+        <div class="popupLayer">
+            <div class="popup">
+                <div class="box 430">
+                    <p class="popTit" th:text="#{mem4.pop.search_member}"></p>
+                    <div class="popCont">
+                        <!-- userSearch -->
+                        <div class="tableStyle aCenter inputArea mb10">
+                            <table>
+                                <colgroup>
+                                    <col style="width: 10%;">
+                                    <col style="width: 40%;">
+                                    <col style="width: 50%;">
+                                </colgroup>
+                                <thead>
+                                <tr>
+                                    <th th:text="#{select}"></th>
+                                    <th th:text="#{mem4.id}"></th>
+                                    <th th:text="#{mem4.exchange_btc}"></th>
+                                </tr>
+                                </thead>
+                                <tbody id="searchMemeberList">
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- //userSearch -->
+                    </div>
+                    <p class="popButton">
+                        <a href="javascript:;" class="popConfirm" id="confirmBtn" th:text="#{confirm.btn}"></a>
+                        <a href="javascript:;" class="popCancel" th:text="#{cancel.btn}"></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- //userSearch -->
+
+    <!-- finalConfirm --> <!--TODO 팝업이 있습니다-->
+    <div class="popupArea" id="finalConfirm" style="display: none;">
+        <div class="dim"></div>
+        <div class="popupLayer">
+            <div class="popup">
+                <div class="box 430">
+                    <p class="popTit" id="final_confirm_title" th:text="#{mem4.final_confirm}"></p>
+                    <div class="popCont">
+                        <!-- finalConfirm -->
+                        <dl class="fc-elem">
+                            <dt th:text="#{coin}"></dt>
+                            <dd id="final_coin_name"></dd>
+                        </dl>
+                        <dl class="fc-elem">
+                            <dt th:text="#{mem4.individual_quantity}"></dt>
+                            <dd id="final_coin_quantity"></dd>
+                        </dl>
+                        <dl class="fc-elem">
+                            <dt th:text="#{mem4.total_quantity}"></dt>
+                            <dd id="final_total_quantity"></dd>
+                        </dl>
+                        <dl class="fc-elem">
+                            <dt id="final_content_msg" th:text="#{mem4.payment_content}"></dt>
+                            <dd id="final_content"></dd>
+                        </dl>
+                        <dl class="fc-elem">
+                            <dt th:text="#{admin.id}"></dt>
+                            <dd th:text="${member_proc.id}"></dd>
+                        </dl>
+                        <dl class="fc-elem">
+                            <dt th:text="#{mem4.admin_password}"></dt>
+                            <dd>
+                            <span class="typeText">
+                                <input type="password" name="pw" id="pw" placeholder="Password"/>
+                            </span>
+                            </dd>
+                        </dl>
+                        <!-- //finalConfirm -->
+                    </div>
+                    <p class="popButton">
+                        <a href="javascript:totalUser_Next_approval();" class="popConfirm" th:text="#{approved}"></a>
+                        <a href="javascript:void(0);" class="popCancel" th:text="#{cancel.btn}"></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- //finalConfirm -->
+</th:block>
+<th:block layout:fragment="script">
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var NOT_SELECT_CSV = [[#{not_select_csv}]];
+        var MEMBER_NOT_EXIST = [[#{mem4.alert.message.1}]];
+        var SELECT_MEMBER_NOT_EXIST = [[#{mem4.alert.message.2}]];
+        var PR_TYPE_0 = [[#{payments}]];
+        var PR_TYPE_1 = [[#{recovery}]];
+        var INPUT_QUANTITY = [[#{mem4.alert.message.3}]];
+        var INPUT_CONTENT = [[#{mem4.alert.message.4}]];
+        var PEOPLE = [[#{mem4.people}]];
+        var ALERT_MESSAGE_5 = [[#{mem4.alert.message.5}]];
+        var ALERT_MESSAGE_6 = [[#{mem4.alert.message.6}]];
+        var ALERT_MESSAGE_7 = [[#{mem4.alert.message.7}]];
+        var ALERT_MESSAGE_8 = [[#{mem4.alert.message.8}]];
+        var ALERT_MESSAGE_9 = [[#{mem4.alert.message.9}]];
+        var INPUT_MEMBER_ID = [[#{mem4.alert.message.10}]];
+        var ALERT_MESSAGE_13= [[#{mem4.alert.message.13}]];
+
+        var STR_REPAYMENT_TITLE = [[#{mem4.final_confirm_repayment}]];
+        var STR_PAYMENT_TITLE = [[#{mem4.final_confirm_payment}]];
+
+        var STR_REPAYMENT = [[#{mem4.repayment_content}]];
+        var STR_PAYMENT = [[#{mem4.payment_content}]];
+
+        var locale = [[${#locale}]];
+        /*]]>*/
+    </script>
+    <script type="text/javascript" src="/js/rsa/rsa.js"></script>
+    <script type="text/javascript" src="/js/rsa/jsbn.js"></script>
+    <script type="text/javascript" src="/js/rsa/prng4.js"></script>
+    <script type="text/javascript" src="/js/rsa/rng.js"></script>
+    <script type="text/javascript" src="/js/include/menu_member.js"></script>
+    <script type="text/javascript" src="/js/member/mem4.js"></script>
+</th:block>
+</body>
+</html>

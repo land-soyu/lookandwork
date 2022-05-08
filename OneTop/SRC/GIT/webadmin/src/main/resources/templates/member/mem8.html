@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+<title th:text="#{mem8.title}"></title>
+<th:block layout:fragment="css">
+    <link rel="stylesheet" href="/css/datepicker.min.css"/>
+</th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+    <div th:replace="include/menu :: member"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+    <th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+    <div class="contSection" th:if="${securityYN}=='Y'">
+        <h2 class="tit_h2" th:text="#{mem8.h2}"></h2>
+        <form action="mem8" method="get" name="search_log_form" id="search_log_form">
+            <input type="hidden" name="page" id="page" th:value="${page}" />
+            <input type="hidden" name="total" id="total" th:value="${blackConsumerResponse.total_blackConsumer_count}">
+            <div class="tableStyle2 memInfo mb20">
+                <table>
+                    <colgroup>
+                        <col style="width: 17%;" />
+                        <col style="width: 33%;" />
+                        <col style="width: 17%" />
+                        <col style="width: 33%" />
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th th:text="#{mem6.table.th.id}"></th>
+                        <td class="full_input"><span class="typeText"><input type="text" name="search_id" id="search_id" th:value="${search_id}" th:placeholder="#{mem6.table.td.id}" /></span></td>
+                        <th th:text="#{date} + ' *'"></th>
+                        <td>
+                            <p class="dateChoice">
+                                <span>
+                                    <img src="/images/calendar_icon.png" alt="날짜선택" />
+                                    <input id="search_reg_dt" name="search_reg_dt" type="text" class="datepicker-here" data-range="true" data-multiple-dates-separator=" - " th:data-language="${#locale}" placeholder="YYYY.MM.DD - YYYY.MM.DD" th:value="${search_reg_dt != null} ? ${search_reg_dt} : ''" />
+                                </span>
+                            </p>
+                            <a href="javascript: setDateChoiceChange(1);"  class="dateSelectBtn" th:text="#{date.select.btn.1}"></a>
+                            <a href="javascript: setDateChoiceChange(2);"  class="dateSelectBtn" th:text="#{date.select.btn.2}"></a>
+                            <a href="javascript: setDateChoiceChange(3);"  class="dateSelectBtn" th:text="#{date.select.btn.3}"></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{type} + ' *'"></th>
+                        <td class="full_input">
+                            <span class="typeSelect">
+                                <select name="search_state">
+                                    <option value="all" th:selected="${search_state == 'all'}" th:text="#{all}"></option>
+                                    <option value="0" th:selected="${search_state == '0'}" th:text="#{mem1.mod.blackconsumer.state.0}"></option>
+                                    <option value="1" th:selected="${search_state == '1'}" th:text="#{mem1.mod.blackconsumer.state.1}"></option>
+                                </select>
+                            </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="buttonRight mb50">
+                <a href="javascript:;" class="btnType" id="search_log_btn" th:text="#{search.btn}"></a>
+            </div>
+            <div class="listCountWrap">
+                <h3 class="tit_h3" th:if="${#locale.toString()} == 'ko'" th:text="#{cnt.search} + ' ' + ${blackConsumerResponse.total_blackConsumer_count}  + #{cnt}"></h3>
+                <h3 class="tit_h3" th:if="${#locale.toString()} == 'en'" th:text="${blackConsumerResponse.total_blackConsumer_count} + ' ' + #{cnt.search}"></h3>
+                <span class="typeSelect">
+                    <select name="search_listCount" id="searchListCount">
+                        <option value="10" th:selected="${search_listCount == 10}">10</option>
+                        <option value="20" th:selected="${search_listCount == 20}">20</option>
+                        <option value="50" th:selected="${search_listCount == 50}">50</option>
+                        <option value="100" th:selected="${search_listCount == 100}">100</option>
+                    </select>
+                </span>
+            </div>
+        </form>
+        <div class="tableStyle aCenter head2 font13 mb20">
+            <table>
+                <colgroup>
+                    <col style="width: 4%;" />
+                    <col style="width: 16%;" />
+                    <col style="width: 5%;" />
+                    <col style="width: 15%;" />
+                    <col style="width: 10%;" />
+                    <col style="width: 10%;" />
+                    <col style="width: 10%;" />
+                    <col style="width: 10%;" />
+                    <col style="width: 10%;" />
+                    <col style="width: 10%;" />
+                </colgroup>
+                <thead>
+                <tr>
+                    <th th:text="#{number}"></th>
+                    <th th:text="#{member.id}"></th>
+                    <th th:text="#{status}"></th>
+                    <th th:text="#{mem4.content}"></th>
+                    <th th:text="#{mem1.mod.sub.stop.memo}"></th>
+                    <th th:text="#{sys7.start.dt}"></th>
+                    <th th:text="#{sys7.end.dt}"></th>
+                    <th th:text="#{mem1.mod.sub.process.id}"></th>
+                    <th th:text="#{mem1.mod.sub.release.id}"></th>
+                    <th th:text="#{mem1.mod.sub.release.memo}"></th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.size(blackConsumerResponse.blackConsumerList)} > 0" th:each="blackConsumer : ${blackConsumerResponse.blackConsumerList}" >
+                        <td th:text="${blackConsumer.no}"></td>
+                        <td>
+                            <a th:href="'javascript: show_member_detail_no(\'' + ${blackConsumer.mb_id} + '\', \'' + ${blackConsumer.mb_no} + '\')'" th:text="${blackConsumer.mb_id}"></a>
+                        </td>
+                        <td>
+                            <span th:if="${blackConsumer.state} == 0" th:text="#{mem1.mod.blackconsumer.state.0}"></span>
+                            <span th:if="${blackConsumer.state} == 1" th:text="#{mem1.mod.blackconsumer.state.1}"></span>
+                        </td>
+                        <td class="pushTalble02">
+                            <p>
+                                <span th:if="${blackConsumer.type} == 0" th:text="#{mem1.mod.blackconsumer.type.0}"></span>
+                                <span th:if="${blackConsumer.type} == 1" th:text="#{mem1.mod.blackconsumer.type.1}"></span>
+                                <span th:if="${blackConsumer.type} == 2" th:text="#{mem1.mod.blackconsumer.type.2}"></span>
+                            </p>
+                            <p class="typeToolTip" th:if="${blackConsumer.type_memo} and ${blackConsumer.type_memo != ''}">
+                                <span>(</span>
+                                <span th:text="${blackConsumer.type_memo}" class="txid"></span>
+                                <span class="toolTipBox">
+                                        <span th:text="${blackConsumer.type_memo}"></span>
+                                    </span>
+                                <span>)</span>
+                            </p>
+                        </td>
+                        <td th:text="${blackConsumer.mb_blk_type}"></td>
+                        <td th:text="${#dates.format(blackConsumer.reg_dt, 'yyyy-MM-dd')}"></td>
+                        <td th:text="${#dates.format(blackConsumer.end_dt, 'yyyy-MM-dd')}"></td>
+                        <td th:text="${blackConsumer.reg_id}"></td>
+                        <td th:text="${blackConsumer.rel_id}"></td>
+                        <td class="pushTalble02">
+                            <p class="typeToolTip" th:if="${blackConsumer.memo} and ${blackConsumer.memo != ''}">
+                                <span th:text="${blackConsumer.memo}" class="txid"></span>
+                                <span class="toolTipBox" style="left: -190px;">
+                                    <span th:text="${blackConsumer.memo}"></span>
+                                </span>
+                            </p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="buttonRight">
+            <a href="javascript:;" class="btnType" id="mem8_excel_down_btn" th:text="#{excel.download.btn}"></a>
+        </div>
+        <div class="pageFoot inPaging">
+            <div class="paging">
+                <a href="javascript: goPage('1', '#search_log_form');" class="prevBt"></a>
+                <a th:if="${blackConsumerResponse.pageNaviResponse.isPrev == 1}" href="javascript: goPrePage('#search_log_form');" class="beforeBt"></a>
+                <a th:if="${blackConsumerResponse.pageNaviResponse.isPrev != 1}" href="javascript:;" class="beforeBt"></a>
+                <ul th:each="index: ${#numbers.sequence(blackConsumerResponse.pageNaviResponse.decadeFirst, blackConsumerResponse.pageNaviResponse.decadeLast)}">
+                    <li th:class="${blackConsumerResponse.pageNaviResponse.current_page == index ? 'on' : ''}"><a th:href="@{'javascript: goPage(' + ${index} + ', \'#search_log_form\');'}" th:text="${index}"></a></li>
+                </ul>
+                <a th:if="${blackConsumerResponse.pageNaviResponse.isNext == 1}" href="javascript: goNextPage('#search_log_form');" class="afterBt"></a>
+                <a th:if="${blackConsumerResponse.pageNaviResponse.isNext != 1}" href="javascript:;" class="afterBt"></a>
+                <a th:href="@{'javascript: goPage(' + ${blackConsumerResponse.pageNaviResponse.lastPage} + ', \'#search_log_form\');'}" href="javascript: goPage();" class="nextBt"></a>
+            </div>
+        </div>
+    </div>
+    <!-- //contSection -->
+</div>
+<!-- //contents -->
+<th:block layout:fragment="side"></th:block>
+<th:block layout:fragment="script">
+    <script type="text/javascript" src="/js/datepicker.min.js"></script>
+    <script type="text/javascript" src="/js/i18n/datepicker.ko.js"></script>
+    <script type="text/javascript" src="/js/i18n/datepicker.en.js"></script>
+    <script type="text/javascript" src="/js/include/menu_member.js"></script>
+    <script type="text/javascript" src="/js/member/mem8.js"></script>
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var lang = [[${#locale}]];
+        console.log(lang);
+
+        var DATEPICKER_ALERT_1 = [[#{datepicker.alert.1}]];
+        var ALERT_EXCELDOWNLOAD_ERR_MSG_1 = [[#{alert.exceldownload.err.msg.1}]];
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

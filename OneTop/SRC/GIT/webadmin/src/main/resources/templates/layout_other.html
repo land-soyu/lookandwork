@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<meta name="HandheldFriendly" content="True" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<title>Bimax</title>
+<!-- 공통으로 쓰이는 css파일을넣는다.-->
+<link rel="shortcut icon" href="/images/favicon.ico" />
+<link rel="stylesheet" href="/css/basic.css" />
+<link rel="stylesheet" href="/css/font-awesome.css" />
+<link rel="stylesheet" href="/css/style.css" />
+<style type="text/css">
+    /*해당 페이지에서만 header 하단 메뉴를 감추기 위해 사용*/
+    .header .menu {display: none;}
+</style>
+<!-- 사용자 CSS 영역이 들어감 -->
+
+</head>
+<body class="newWin">
+    <!-- header -->
+    <header th:replace="include/menu :: header"></header>
+    <section id="container">
+        <!-- content -->
+        <div class="contents" layout:fragment="content"></div>
+    </section>
+    <!-- 사용자 side 영역이 들어감 -->
+    <th:block layout:fragment="side"></th:block>
+    <!-- 공통으로 쓰이는 js파일을넣는다.-->
+    <script type="text/javascript" src='/js/jquery-1.12.0.min.js'></script>
+    <script type="text/javascript" src='/js/common.js'></script>
+    <script type="text/javascript" src='/js/include/header.js'></script>
+    <script type="text/javascript" src='/js/jquery.fileDownload.js'></script>
+    <script type="text/javascript" src='/js/jquery.blockUI.js'></script>
+    <!-- 사용자 js 영역이 들어감 -->
+    <th:block layout:fragment="script"></th:block>
+</body>
+</html>

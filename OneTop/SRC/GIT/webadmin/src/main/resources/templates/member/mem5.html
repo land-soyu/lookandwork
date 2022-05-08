@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+    <title th:text="#{mem5.title}"></title>
+    <th:block layout:fragment="css"></th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+    <div th:replace="include/menu :: member"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+    <th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+    <div class="contSection" th:if="${securityYN}=='Y'">
+        <form action="mem5" name="search_mem5_form" id="search_mem5_form" method="POST">
+            <input type="hidden" name="sortName" th:value="${sortName}"/>
+            <input type="hidden" name="sortOrderBy" th:value="${sortOrderBy}"/>
+            <input type="hidden" name="page" id="page" th:value="${page}" />
+            <input type="hidden" name="total" id="total" th:value="${response.counts.search}">
+            <h2 class="tit_h2" th:text="#{mem5.h2}"></h2>
+            <div class="tableStyle2 memInfo mb20">
+                <table>
+                    <colgroup>
+                        <col style="width: 17%;" />
+                        <col style="width: 33%;" />
+                        <col style="width: 17%" />
+                        <col style="width: 33%" />
+                    </colgroup>
+                    <tbody>
+                        <tr>
+                            <th th:text="#{member.id}"></th>
+                            <td class="full_input"><span class="typeText"><input name="mb_id" type="text" th:placeholder="#{member.id}" th:value="${mb_id}" /></span></td>
+                            <th th:text="#{mem5.table.thead.th.change_date} + ' *'"></th>
+                            <td>
+                                <a href="javascript: setDateChoiceChange(0);"  class="dateSelectBtn2" th:text="#{bank31.date.select.btn.1}"></a>
+                                <a href="javascript: setDateChoiceChange(2);"  class="dateSelectBtn2" th:text="#{bank31.date.select.btn.2}"></a>
+                                <p class="dateChoice">
+                                    <span>
+                                        <img src="/images/calendar_icon.png"/>
+                                        <input id="change_dt" name="change_dt" type="text" class="datepicker-here"
+                                               data-range="true"
+                                               data-multiple-dates-separator=" - "
+                                               th:data-language="${#locale}"
+                                               placeholder="YYYY.MM.DD - YYYY.MM.DD"
+                                               th:value="${change_dt != null} ? ${change_dt} : ''"
+                                        />
+                                    </span>
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th th:text="#{type} + ' *'"></th>
+                            <td >
+                                <span class="typeSelect">
+                                    <select name="action">
+                                        <option th:text="#{all}" value="ALL" th:selected="${action} or ${action} == 'ALL' ? 'true' : 'false'"></option>                                        
+                                        <option th:text="#{mem5.table.thead.th.type.bonus}" value="bonus" th:selected="${action} == 'bonus' ? 'true' : 'false'"></option>
+                                        <option th:text="#{mem5.table.thead.th.type.admin_pay}" value="admin_pay" th:selected="${action} == 'admin_pay' ? 'true' : 'false'"></option>
+                                        <option th:text="#{mem5.table.thead.th.type.admin_retrieve}" value="admin_retrieve" th:selected="${action} == 'admin_retrieve' ? 'true' : 'false'"></option>
+                                    </select>
+                                </span>
+                            </td>
+                            <td colspan="2"></td>
+                        </tr>                        
+                    </tbody>
+                </table>
+            </div>
+            <div class="buttonRight mb50">
+                <a href="javascript:void(0);" class="btnType" id="search_mem5_btn" th:text="#{search.btn}"></a>
+            </div>
+            <div class="listCountWrap">
+                <h3 class="tit_h3" th:if="${#locale.toString()} == 'ko'" th:text="#{cnt.search} + ' ' + ${response.counts.search}  + #{cnt}"></h3>
+                <h3 class="tit_h3" th:if="${#locale.toString()} == 'en'" th:text="${response.counts.search} + ' ' + #{cnt.search}"></h3>
+                <span class="typeSelect">
+                    <a href="javascript:void(0);" id="mem5_excel_down_btn" class="btnType" th:text="#{excel.download.btn}">Excel D/L</a>
+                    <select name="search_listCount" id="searchListCount">
+                        <option value="10" th:selected="${search_listCount == 10}">10</option>
+                        <option value="30" th:selected="${search_listCount == 30}">30</option>
+                        <option value="50" th:selected="${search_listCount == 50}">50</option>
+                        <option value="100" th:selected="${search_listCount == 100}">100</option>
+                        <option value="1000" th:selected="${search_listCount == 1000}">1000</option>
+                </select>
+                </span>
+            </div>
+            <div class="tableStyle memInfo aCenter font13 mb20 fitTable mem05">
+                <table>
+                    <colgroup>
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th th:text="#{number_}"></th>
+                        <th th:text="#{member.id}"></th>
+                        <th th:text="#{type}"></th>
+                        <th th:text="#{mem5.table.thead.th.type.total.bonus}"></th>                        
+                        <th th:text="#{remarks}"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.size(response.memberBalanceLogList)} > 0" th:each="memberBalanceLog, iter : ${response.memberBalanceLogList}">
+                            <td th:text="${memberBalanceLog.idx}"></td>
+                            <td th:if="${member_proc.role != 1}">
+                                <a th:href="'javascript: show_member_detail_no(\'' + ${memberBalanceLog.mb_id} + '\', \'' + ${memberBalanceLog.mb_no} + '\')'" th:text="${memberBalanceLog.mb_id}"></a>
+                            </td>
+                            <td th:unless="${member_proc.role != 1}"><span th:text="${memberBalanceLog.mb_id}"></span></td>
+                            <td>
+                                <span th:if="${memberBalanceLog.type == 'admin_pay'}" th:text="#{mem5.table.thead.th.type.admin_pay}"></span>
+                                <span th:if="${memberBalanceLog.type == 'admin_retrieve'}" th:text="#{mem5.table.thead.th.type.admin_retrieve}"></span>
+                                <span th:if="${memberBalanceLog.type == 'bonus'}" th:text="#{mem5.table.thead.th.type.bonus}"></span>
+                            </td>
+                            <td th:text="${memberBalanceLog.total_bonus + '$'}"></td>
+                            <td th:if="${memberBalanceLog.admin_id != null}"><span th:text="${memberBalanceLog.admin_id + ' / ' + memberBalanceLog.content}"></span></td>
+                            <td th:unless="${memberBalanceLog.admin_id != null}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- <div class="pageFoot mb50">
+                <p class="footText mb15" th:text="${memberBalanceLogSyncDate} ? ('[ ' + #{last.confirm.date} + ${#dates.format(memberBalanceLogSyncDate, 'yyyy-MM-dd HH:mm:ss')} + ' ]') : ''"></p>
+            </div> -->
+            <div class="pageFoot inPaging">
+                <div class="paging">
+                    <a href="javascript: goPage('1', '#search_mem5_form');" class="prevBt"></a>
+                    <a th:if="${response.pageNaviResponse.isPrev == 1}" href="javascript: goPrePage('#search_mem5_form');" class="beforeBt"></a>
+                    <a th:if="${response.pageNaviResponse.isPrev != 1}" href="javascript:;" class="beforeBt"></a>
+                    <ul th:each="index: ${#numbers.sequence(response.pageNaviResponse.decadeFirst, response.pageNaviResponse.decadeLast)}">
+                        <li th:class="${response.pageNaviResponse.current_page == index ? 'on' : ''}"><a th:href="@{'javascript: goPage(' + ${index} + ', \'#search_mem5_form\');'}" th:text="${index}"></a></li>
+                    </ul>
+                    <a th:if="${response.pageNaviResponse.isNext == 1}" href="javascript: goNextPage('#search_mem5_form');" class="afterBt"></a>
+                    <a th:if="${response.pageNaviResponse.isNext != 1}" href="javascript:;" class="afterBt"></a>
+                    <a th:href="@{'javascript: goPage(' + ${response.pageNaviResponse.lastPage} + ', \'#search_mem5_form\');'}" href="javascript: goPage();" class="nextBt"></a>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!-- //contSection -->
+</div>
+<!-- //contents -->
+<th:block layout:fragment="side">
+
+</th:block>
+<th:block layout:fragment="script">
+    <link rel="stylesheet" href="/css/datepicker.min.css"/>
+    <script type="text/javascript" src="/js/datepicker.min.js"></script>
+    <script type="text/javascript" src="/js/i18n/datepicker.ko.js"></script>
+    <script type="text/javascript" src="/js/i18n/datepicker.en.js"></script>
+    <script type="text/javascript" src="/js/include/menu_member.js"></script>
+    <script type="text/javascript" src="/js/member/mem5.js"></script>
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var DATEPICKER_ALERT_1 = [[#{datepicker.alert.1}]];
+        var ALERT_EXCELDOWNLOAD_ERR_MSG_1 = [[#{alert.exceldownload.err.msg.1}]];
+        var lang = [[${#locale}]];
+        console.log(lang);
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Compiler Value="/usr/local/bin/fpc" Date="1572629024"/>
+  <Params Value=" -MObjFPC -Scghi -O1 -gw2 -godwarfsets -gl -k-framework -kCocoa -l -vewnhibq -Fi/Users/soyu/Desktop/Look&amp;walk/14.Together/Lazarus/Together/lib/x86_64-darwin -Fu/Users/soyu/Desktop/Look&amp;walk/14.Together/Lazarus/Together/Library -Fu/Users/soyu/Desktop/Look&amp;walk/14.Together/Lazarus/Together/Library/lib -Fu/Library/Lazarus/lcl/units/x86_64-darwin/cocoa -Fu/Library/Lazarus/lcl/units/x86_64-darwin -Fu/Library/Lazarus/components/lazutils/lib/x86_64-darwin -Fu/Library/Lazarus/packager/units/x86_64-darwin -Fu/Users/soyu/Desktop/Look&amp;walk/14.Together/Lazarus/Together/ -FU/Users/soyu/Desktop/Look&amp;walk/14.Together/Lazarus/Together/lib/x86_64-darwin/ -FE/Users/soyu/Desktop/Look&amp;walk/14.Together/Lazarus/Together/ -o/Users/soyu/Desktop/Look&amp;walk/14.Together/Lazarus/Together/project1 -dLCL -dLCLcocoa project1.lpr"/>
+</CONFIG>

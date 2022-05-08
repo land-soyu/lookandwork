@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+<title th:text="#{exc1.title}"></title>
+<th:block layout:fragment="css"></th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+    <div th:replace="include/menu :: exchange"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+    <div class="contSection">
+        <form action="exc1" name="search_exc1_form" id="search_exc1_form" method="POST">
+            <input type="hidden" name="sortName" th:value="${sortName}"/>
+            <input type="hidden" name="sortOrderBy" th:value="${sortOrderBy}"/>
+            <input type="hidden" name="page" id="page" th:value="${page}" />
+            <input type="hidden" name="total" id="total" th:value="${response.counts.search}">
+            <h2 class="tit_h2" th:text="#{exc1.h2}"></h2>
+            <div class="tableStyle2 dealingsInfo mb20">
+                <table>
+                    <colgroup>
+                        <col style="width: 17%;" />
+                        <col style="width: 33%;" />
+                        <col style="width: 17%" />
+                        <col style="width: 33%" />
+                    </colgroup>
+                    <tbody>
+                        <tr>
+                            <th th:text="#{member.id}"></th>
+                            <td><span class="typeText"><input name="mb_id" type="text" th:placeholder="#{member.id}" th:value="${mb_id}" /></span></td>
+                            <th th:text="#{request.date} + ' *'"></th>
+                            <td>
+                                <p class="dateChoice">
+                                    <span>
+                                        <img src="/images/calendar_icon.png"/>
+                                        <input id="req_dt" name="req_dt" type="text" class="datepicker-here"
+                                               data-range="true"
+                                               data-multiple-dates-separator=" - "
+                                               th:data-language="${#locale}"
+                                               placeholder="YYYY.MM.DD - YYYY.MM.DD"
+                                               th:value="${req_dt != null} ? ${req_dt} : ''"
+                                        />
+                                    </span>
+                                </p>
+                                <a href="javascript: setDateChoiceChange(1);"  class="dateSelectBtn" th:text="#{date.select.btn.1}"></a>
+                                <a href="javascript: setDateChoiceChange(2);"  class="dateSelectBtn" th:text="#{date.select.btn.2}"></a>
+                                <a href="javascript: setDateChoiceChange(3);"  class="dateSelectBtn" th:text="#{date.select.btn.3}"></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th th:text="#{coin.market} + ' *'"></th>
+                            <td class="w38">
+                                <span class="typeSelect">
+                                    <select id="coin_flag" name="coin_flag" th:onchange="|preventDuplicatedSelection('coin_flag', 'market_flag', 'ALL', 0)|">
+                                        <option th:text="#{total.coin}" th:value="ALL"></option>
+                                        <option  th:if="${response} != null and ${#lists.size(response.coinList)} > 0" th:each="coin : ${response.coinList}"
+                                                 th:text="${coin}"
+                                                 th:value="${coin}"
+                                                 th:selected="${coin_flag == coin} ? 'true' : 'false'"
+                                        ></option>
+                                    </select>
+                                </span>
+                                <span class="typeSelect">
+                                    <select id="market_flag" name="market_flag" th:onchange="|preventDuplicatedSelection('market_flag', 'coin_flag', 'ALL', 0)|">
+                                        <option th:text="#{market.all}" th:value="ALL"></option>
+                                        <option  th:if="${response} != null and ${#lists.size(response.marketList)} > 0" th:each="market : ${response.marketList}"
+                                                 th:text="${market.market}"
+                                                 th:value="${market.market}"
+                                                 th:selected="${market_flag == market.market} ? 'true' : 'false'"
+                                        ></option>
+                                    </select>
+                                </span>
+                            </td>
+                            <th th:text="#{type} + ' *'"></th>
+                            <td>
+                                <span class="typeSelect">
+                                    <select name="action">
+                                        <option th:text="#{all}" th:value="ALL" th:selected="${action} or ${action} == 'ALL' ? 'true' : 'false'"></option>
+                                        <option th:text="#{sell}" th:value="ask" th:selected="${action} == 'ask' ? 'true' : 'false'"></option>
+                                        <option th:text="#{buy}" th:value="bid" th:selected="${action} == 'bid' ? 'true' : 'false'"></option>
+                                    </select>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th th:text="#{order.number}"></th>
+                            <td>
+                                <span class="typeText"><input name="od_no" type="text" th:placeholder="#{order.number}" th:value="${od_no}" /></span>
+                            </td>
+                            <th th:text="#{status} + ' *'"></th>
+                            <td>
+                                <span class="typeSelect">
+                                    <select name="status">
+                                        <option th:text="#{all}" th:value="ALL" th:selected="${status} or ${status} == 'ALL' ? 'true' : 'false'"></option>
+                                        <option th:text="#{cancel}" th:value="CANCEL" th:selected="${status} == 'CANCEL' ? 'true' : 'false'"></option>
+                                        <option th:text="#{status.except_request}" th:value="OK" th:selected="${status} == 'OK' ? 'true' : 'false'"></option>
+                                    </select>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th th:text="#{channel} + ' *'"></th>
+                            <td>
+                                <span class="typeSelect">
+                                    <select name="search_channel">
+                                        <option value="ALL" th:text="#{all}" th:selected="${search_channel == 'ALL'}"></option>
+                                        <option value="API" th:text="'API'" th:selected="${search_channel == 'API'}"></option>
+                                        <option value="APP" th:text="'APP'" th:selected="${search_channel == 'APP'}"></option>
+                                        <option value="WEB" th:text="'WEB'" th:selected="${search_channel == 'WEB'}"></option>
+                                    </select>
+                                </span>
+                            </td>
+                            <th th:text="#{ip}"></th>
+                            <td>
+                                <span class="typeText"><input name="search_ip" type="text" th:placeholder="#{ip}" th:value="${search_ip}" /></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="buttonRight mb50">
+                <a href="javascript:void(0);" class="btnType" id="search_exc1_btn" th:text="#{search.btn}"></a>
+            </div>
+            <div class="listCountWrap">
+                <h3 class="tit_h3" th:if="${#locale.toString()} == 'ko'" th:text="#{cnt.search} + ' ' + ${response.counts.search}  + #{cnt}"></h3>
+                <h3 class="tit_h3" th:if="${#locale.toString()} == 'en'" th:text="${response.counts.search} + ' ' + #{cnt.search}"></h3>
+                <span class="typeSelect">
+                    <select name="search_listCount" id="searchListCount">
+                        <option value="10" th:selected="${search_listCount == 10}">10</option>
+                        <option value="20" th:selected="${search_listCount == 20}">20</option>
+                        <option value="50" th:selected="${search_listCount == 50}">50</option>
+                        <option value="100" th:selected="${search_listCount == 100}">100</option>
+                    </select>
+                </span>
+            </div>
+            <div class="tableStyle dealingsInfo aCenter font13 head2 mb20 fitTable">
+                <table>
+                    <colgroup>
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th th:text="#{order.number}"></th>
+                        <th th:text="#{type}"></th>
+                        <th th:text="#{coin.market}"></th>
+                        <th th:text="#{member.id}"></th>
+                        <th colspan="2" th:text="#{exc1.table.thead.th.od_price}"></th>
+                        <th colspan="2"><p class="orderby"><span th:text="#{exc1.table.thead.th.od_amount}"></span> <button type="button" id="ord_amount" onclick="orderBy(this.id);" th:style="${sortName == 'ord_amount'} ? 'color:red;' : ''" th:text="${sortName == 'ord_amount' and sortOrderBy == 'ASC'} ? #{orderby.asc} : #{orderby.desc}"></button></p></th>
+                        <th colspan="2"><p class="orderby"><span th:text="#{exc1.table.thead.th.od_total}"></span> <button type="button" id="balance" onclick="orderBy(this.id);" th:style="${sortName == 'balance'} ? 'color:red;' : ''" th:text="${sortName == 'balance' and sortOrderBy == 'ASC'} ? #{orderby.asc} : #{orderby.desc}"></button></p></th>
+                        <th th:text="#{amount.clamping}"></th>
+                        <th th:text="#{status}"></th>
+                        <th><p class="orderby"><span th:text="#{request.date}"></span><button type="button" id="ord_date" onclick="orderBy(this.id);" th:style="${sortName == 'ord_date'} ? 'color:red;' : ''" th:text="${sortName == 'ord_date' and sortOrderBy == 'ASC'} ? #{orderby.asc} : #{orderby.desc}"></button></p></th>
+                        <th th:text="#{channel}"></th>
+                        <th th:text="#{ip}"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.size(response.orderRequestHistoryList)} > 0" th:each="orderHistory, iter : ${response.orderRequestHistoryList}">
+                        <td>
+                            <a th:if="${member_proc.role != 1}" th:href="${orderHistory.is_cancel} ?
+                            'javascript:showCancelPopup(\'' +
+                            ${orderHistory.ord_no} + '\', \'' +
+                            ${#numbers.formatDecimal(orderHistory.ord_price, 1, 'COMMA', 4, 'POINT')} + ' ' +  ${#strings.arraySplit(orderHistory.market_name, '/')[1]} + '\', \'' +
+                            ${#numbers.formatDecimal(orderHistory.ord_amount, 1, 'COMMA', 4, 'POINT')} + ' ' + ${#strings.arraySplit(orderHistory.market_name, '/')[0]} + '\', \'' +
+                            ${#numbers.formatDecimal(orderHistory.balance, 1, 'COMMA', 4, 'POINT')} + ' ' + ${#strings.arraySplit(orderHistory.market_name, '/')[1]} + ' \');'
+                            :
+                            'javascript:showSignPopup(\'' +
+                            ${orderHistory.mb_id} + '\', \'' +
+                            ${orderHistory.action} + '\', \'' +
+                            ${orderHistory.ord_no} + '\', \'' +
+                            ${#strings.arraySplit(orderHistory.market_name, '/')[0]} + '\', \'' +
+                            ${#strings.arraySplit(orderHistory.market_name, '/')[0]} + '\');'"
+                               th:text="${orderHistory.ord_no}"></a>
+                            <span th:if="${member_proc.role == 1}" th:text="${orderHistory.ord_no}"></span>
+                        </td>
+                        <td th:text="#{'exc1.table.thead.th.type.' + ${orderHistory.action}}"></td>
+                        <td th:text="${orderHistory.market_name}"></td>
+                        <td>
+                            <a th:if="${member_proc.role != 1}" th:href="'javascript:show_member_detail(\'' + ${orderHistory.mb_id} + '\')'" th:text="${orderHistory.mb_id}"></a>
+                            <span th:if="${member_proc.role == 1}" th:text="${orderHistory.mb_id}"></span>
+                        </td>
+
+                        <td th:if="${#strings.arraySplit(orderHistory.market_name, '/')[1] == 'KRW'}" th:text="${#numbers.formatDecimal(orderHistory.ord_price, 1, 'COMMA', 0, 'POINT')}"></td>
+                        <td th:unless="${#strings.arraySplit(orderHistory.market_name, '/')[1] == 'KRW'}" th:text="${#numbers.formatDecimal(orderHistory.ord_price, 1, 'COMMA', 4, 'POINT')}"></td>
+                        <td th:text="${#strings.arraySplit(orderHistory.market_name, '/')[1]}"></td>
+
+                        <td th:text="${#numbers.formatDecimal(orderHistory.ord_amount, 1, 'COMMA', 4, 'POINT')}"></td>
+                        <td th:text="${#strings.arraySplit(orderHistory.market_name, '/')[0]}"></td>
+
+                        <td th:if="${#strings.arraySplit(orderHistory.market_name, '/')[1] == 'KRW'}" th:text="${#numbers.formatDecimal(orderHistory.balance, 1, 'COMMA', 0, 'POINT')}"></td>
+                        <td th:unless="${#strings.arraySplit(orderHistory.market_name, '/')[1] == 'KRW'}" th:text="${#numbers.formatDecimal(orderHistory.balance, 1, 'COMMA', 4, 'POINT')}"></td>
+                        <td th:text="${#strings.arraySplit(orderHistory.market_name, '/')[1]}"></td>
+
+                        <td th:text="${#numbers.formatDecimal(orderHistory.sign_amount, 1, 'COMMA', 4, 'POINT')}"></td>
+                        <td>
+                            <a th:if="${member_proc.role != 1}" th:href="${orderHistory.is_cancel} ?
+                                'javascript:showCancelPopup(\'' +
+                                ${orderHistory.ord_no} + '\', \'' +
+                                ${#numbers.formatDecimal(orderHistory.ord_price, 1, 'COMMA', 4, 'POINT')} + ' ' +  ${#strings.arraySplit(orderHistory.market_name, '/')[1]} + '\', \'' +
+                                ${#numbers.formatDecimal(orderHistory.ord_amount, 1, 'COMMA', 4, 'POINT')} + ' ' + ${#strings.arraySplit(orderHistory.market_name, '/')[0]} + '\', \'' +
+                                ${#numbers.formatDecimal(orderHistory.balance, 1, 'COMMA', 4, 'POINT')} + ' ' + ${#strings.arraySplit(orderHistory.market_name, '/')[1]} + ' \');'
+                                :
+                                'javascript:showSignPopup(\'' +
+                                ${orderHistory.mb_id} + '\', \'' +
+                                ${orderHistory.action} + '\', \'' +
+                                ${orderHistory.ord_no} + '\', \'' +
+                                ${#strings.arraySplit(orderHistory.market_name, '/')[0]} + '\', \'' +
+                                ${#strings.arraySplit(orderHistory.market_name, '/')[0]} + '\');'"
+
+                                th:text="${orderHistory.is_cancel} ? #{cancel} : (${orderHistory.sign_amount} == 0 ? #{request} : (${orderHistory.ord_amount - orderHistory.sign_amount} > 0 ? #{status.inprogress} : #{status.complete})) ">
+                            </a>
+                            <span th:if="${member_proc.role == 1}"
+                                th:text="${orderHistory.is_cancel} ? #{cancel} : (${orderHistory.sign_amount} == 0 ? #{request} : (${orderHistory.ord_amount - orderHistory.sign_amount} > 0 ? #{status.inprogress} : #{status.complete})) ">
+                            </span>
+                        </td>
+                        <td th:text="${#dates.format(orderHistory.ord_date, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                        <td th:text="${orderHistory.channel} ? ${orderHistory.channel} : ''"></td>
+                        <td th:text="${orderHistory.req_ip_addr}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="buttonRight">
+                <a href="javascript:void(0);" id="exc1_excel_down_btn" class="btnType" th:text="#{excel.download.btn}">Excel D/L</a>
+            </div>
+            <div class="pageFoot mb50">
+                <ul class="footList">
+                    <li th:text="#{exc1.footer.message1}"></li>
+                    <li th:text="#{exc1.footer.message2}"></li>
+                </ul>
+            </div>
+            <div class="pageFoot inPaging">
+                <div class="paging">
+                    <a href="javascript: goPage('1', '#search_exc1_form');" class="prevBt"></a>
+                    <a th:if="${response.pageNaviResponse.isPrev == 1}" href="javascript: goPrePage('#search_exc1_form');" class="beforeBt"></a>
+                    <a th:if="${response.pageNaviResponse.isPrev != 1}" href="javascript:;" class="beforeBt"></a>
+                    <ul th:each="index: ${#numbers.sequence(response.pageNaviResponse.decadeFirst, response.pageNaviResponse.decadeLast)}">
+                        <li th:class="${response.pageNaviResponse.current_page == index ? 'on' : ''}"><a th:href="@{'javascript: goPage(' + ${index} + ', \'#search_exc1_form\');'}" th:text="${index}"></a></li>
+                    </ul>
+                    <a th:if="${response.pageNaviResponse.isNext == 1}" href="javascript: goNextPage('#search_exc1_form');" class="afterBt"></a>
+                    <a th:if="${response.pageNaviResponse.isNext != 1}" href="javascript:;" class="afterBt"></a>
+                    <a th:href="@{'javascript: goPage(' + ${response.pageNaviResponse.lastPage} + ', \'#search_exc1_form\');'}" href="javascript: goPage();" class="nextBt"></a>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!-- //contSection -->
+</div>
+<!-- //contents -->
+<th:block layout:fragment="side">
+    <!-- {{매도}}상세 체결 현황 --> <!--TODO 팝업-->
+    <div class="popupArea" id="dealListPopup" style="display: none;">
+        <div class="dim"></div>
+        <div class="popupLayer">
+            <div class="popup">
+                <div class="box pop1200">
+                    <p class="popTit" id="sign_title">{{매도}}상세 체결 현황</p>
+                    <div class="popCont">
+                        <!-- {{매도}}상세 체결 현황 -->
+                        <div class="dealingTable">
+                            <table>
+                                <tbody>
+                                <tr>
+                                    <th th:text="#{exc1.table.thead.th.od_amount}"></th>
+                                    <td id="sign_od_amount"></td>
+                                </tr>
+                                <tr>
+                                    <th th:text="#{exc1.sign.remain_amount}"></th>
+                                    <td id="sign_remain_amount"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <table id="sign_table">
+                                <colgroup>
+
+                                </colgroup>
+                                <thead>
+                                <tr>
+                                    <th th:text="#{contract.number}"></th>
+                                    <th colspan="2" th:text="#{price}"></th>
+                                    <th colspan="2" th:text="#{amount.clamping}"></th>
+                                    <th colspan="2" th:text="#{total.fastening}"></th>
+                                    <th colspan="2" th:text="#{fee}"></th>
+                                </tr>
+                                 </thead>
+                                <tbody id="sign_tbody">
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- //{{매도}}상세 체결 현황 -->
+                    </div>
+                    <p class="popButton">
+                        <a href="javascript:void(0);" class="popCancel">닫기</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- //{{매도}}상세 체결 현황 -->
+
+    <!-- 취소건 상세보기 --> <!--TODO 팝업-->
+    <div class="popupArea" id="cancelListPopup" style="display: none;">
+        <div class="dim"></div>
+        <div class="popupLayer">
+            <div class="popup">
+                <div class="box pop530">
+                    <p class="popTit" th:text="#{exc1.cancel.title}"></p>
+                    <div class="popCont">
+                        <!-- 취소건 상세보기 -->
+                        <div class="cancelListTable">
+                            <table>
+                                <tbody>
+                                <tr>
+                                    <th th:text="#{order.number}"></th>
+                                    <td id="cancel_od_id"></td>
+                                </tr>
+                                <tr>
+                                    <th th:text="#{exc1.table.thead.th.od_price}"></th>
+                                    <td id="cancel_od_price"></td>
+                                </tr>
+                                <tr>
+                                    <th th:text="#{exc1.table.thead.th.od_amount}"></th>
+                                    <td id="cancel_od_amount"></td>
+                                </tr>
+                                <tr>
+                                    <th th:text="#{exc1.table.thead.th.od_total}"></th>
+                                    <td id="cancel_od_total"></td>
+                                </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- //취소건 상세보기 -->
+                    </div>
+                    <p class="popButton">
+                        <a href="javascript:void(0);" class="popCancel">닫기</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- //취소건 상세보기 -->
+</th:block>
+<th:block layout:fragment="script">
+    <link rel="stylesheet" href="/css/datepicker.min.css"/>
+    <script type="text/javascript" src="/js/datepicker.min.js"></script>
+    <script type="text/javascript" src="/js/i18n/datepicker.ko.js"></script>
+    <script type="text/javascript" src="/js/i18n/datepicker.en.js"></script>
+    <script type="text/javascript" src="/js/include/menu_exchange.js"></script>
+    <script type="text/javascript" src="/js/exchange/exc1.js"></script>
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var STR_REQUEST_FAIL = [[#{import.requestfail}]];
+        var STR_SIGN_TITLE = [[#{exc1.sign.title}]];
+        var STR_BID = [[#{buy}]];
+        var STR_ASK = [[#{sell}]];
+        var DATEPICKER_ALERT_1 = [[#{datepicker.alert.1}]];
+        var ALERT_EXCELDOWNLOAD_ERR_MSG_1 = [[#{alert.exceldownload.err.msg.1}]];
+
+        // 엑셀다운로드 테스트용
+        var EXCEL_MAKE_MSG_1 = [[#{excel.make.msg.1}]];
+        var EXCEL_MAKE_MSG_2 = [[#{excel.make.msg.2}]];
+        /*]]>*/
+    </script>
+</th:block>
+</body>
+</html>

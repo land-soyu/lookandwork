@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+<title th:text="#{auth1.title}"></title>
+<th:block layout:fragment="css">
+
+</th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+    <div th:replace="include/menu :: authority"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+    <th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+    <div class="contSection" th:if="${securityYN}=='Y'">
+        <h2 class="tit_h2" th:text="#{auth1.h2}"></h2>
+        <form action="auth1" method="get" name="searchForm" id="searchForm">
+            <div class="topSearchArea">
+                <input type="hidden" name="page" id="page" th:value="${page}" />
+                <input type="hidden" name="totalPage" id="totalPage" th:value="${adminMemberResponse.total_adminMember_count}" />
+                <span class="typeSelect">
+                    <select name="search_type" id="search_type">
+                        <option value="all" th:selected="${search_type == 'all'}" th:text="#{auth1.search.option.all}"></option>
+                        <option value="id" th:selected="${search_type == 'id'}" th:text="#{auth1.search.option.id}"></option>
+                        <option value="name" th:selected="${search_type == 'name'}" th:text="#{auth1.search.option.name}"></option>
+                        <option value="phone_number" th:selected="${search_type == 'phone_number'}" th:text="#{auth1.search.option.phone}"></option>
+                    </select>
+                </span>
+                <span class="typeText">
+                    <input type="text" name="search_content" id="search_content" th:value="${search_content}" th:placeholder="#{auth1.search.placeholder}" />
+                    <a href="javascript: searchMember();" class="topSearchButton fa fa-search"><mark th:text="#{search.btn}"></mark></a>
+                </span>
+            </div>
+            <div class="listCountWrap">
+                <h3 class="tit_h3" th:if="${#locale.toString()} == 'ko'" th:text="#{cnt.search} + ' ' + ${adminMemberResponse.total_adminMember_count}  + #{cnt}"></h3>
+                <h3 class="tit_h3" th:if="${#locale.toString()} == 'en'" th:text="${adminMemberResponse.total_adminMember_count} + ' ' + #{cnt.search}"></h3>
+                <span>
+                    <a href="auth1_mod" class="btnType" th:text="#{add.btn}"></a>
+                    <span class="countSelect">
+                        <select name="search_listCount" id="searchListCount">
+                            <option value="10" th:selected="${search_listCount == 10}">10</option>
+                            <option value="20" th:selected="${search_listCount == 20}">20</option>
+                            <option value="50" th:selected="${search_listCount == 50}">50</option>
+                            <option value="100" th:selected="${search_listCount == 100}">100</option>
+                        </select>
+                    </span>
+                </span>
+            </div>
+        </form>
+        <div class="tableStyle authorityList aCenter mb20">
+            <table>
+                <colgroup>
+                    <col style="width: 6%;" />
+                    <col style="width: 10%;" />
+                    <col style="width: 16%;" />
+                    <col style="width: 16%;" />
+                    <col style="width: 16%;" />
+                    <col style="width: 16%;" />
+                    <col style="width: 20%;" />
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th th:text="#{select}"></th>
+                        <th th:text="#{auth1.table.thead.th.no}"></th>
+                        <th th:text="#{auth1.table.thead.th.auth}"></th>
+                        <th th:text="#{auth1.table.thead.th.id}"></th>
+                        <th th:text="#{contacts}"></th>
+                        <th th:text="#{auth1.table.thead.th.name}"></th>
+                        <th th:text="#{last.modified.date}"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="adminMember : ${adminMemberResponse.adminMemberList}">
+                        <td class="listCheck"><input type="checkbox" name="checkNo" th:id="|check_| + ${adminMember.no}" th:value="${adminMember.no}"><label th:for="|check_| + ${adminMember.no}"><span class="hide"></span></label></td>
+                        <td th:text="${adminMember.no}"></td>
+                        <td th:text="#{header.role.desc. + ${adminMember.role}}"></td>
+                        <td>
+                            <a th:href="@{'auth1_mod?no=' + ${adminMember.no}}" th:text="${adminMember.id}"></a>
+                        </td>
+                        <td th:text="${adminMember.phone_number}"></td>
+                        <td th:text="${adminMember.name}"></td>
+                        <td th:text="${#dates.format(adminMember.mod_dt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="buttonRight">
+            <a href="javascript: deleteAdminMember();;" class="btnType" th:text="#{delete.btn}"></a>
+        </div>
+        <div class="pageFoot inPaging">
+            <div class="paging">
+                <a href="javascript: goPage('1', '#searchForm');" class="prevBt"></a>
+                <a th:if="${adminMemberResponse.pageNaviResponse.isPrev == 1}" href="javascript: goPrePage('#searchForm');" class="beforeBt"></a>
+                <a th:if="${adminMemberResponse.pageNaviResponse.isPrev != 1}" href="javascript:;" class="beforeBt"></a>
+                <ul th:each="index: ${#numbers.sequence(adminMemberResponse.pageNaviResponse.decadeFirst, adminMemberResponse.pageNaviResponse.decadeLast)}">
+                    <li th:class="${adminMemberResponse.pageNaviResponse.current_page == index ? 'on' : ''}"><a th:href="@{'javascript: goPage(' + ${index} + ', \'#searchForm\');'}" th:text="${index}"></a></li>
+                </ul>
+                <a th:if="${adminMemberResponse.pageNaviResponse.isNext == 1}" href="javascript: goNextPage('#searchForm');" class="afterBt"></a>
+                <a th:if="${adminMemberResponse.pageNaviResponse.isNext != 1}" href="javascript:;" class="afterBt"></a>
+                <a th:href="@{'javascript: goPage(' + ${adminMemberResponse.pageNaviResponse.lastPage} + ', \'#searchForm\');'}" class="nextBt"></a>
+            </div>
+        </div>
+    </div>
+    <!-- //contSection -->
+</div>
+<!-- //contents -->
+<th:block layout:fragment="side"></th:block>
+<th:block layout:fragment="script">
+<script type="text/javascript" th:inline="javascript">
+/*<![CDATA[*/
+/* 알림창 메세지 가져오기 */
+function getMessage(index) {
+
+    var message = '';
+
+    switch (index) {
+        case 1:
+            message = [[#{nothing.selected}]];
+            break;
+        case 2:
+            message = [[#{auth1.alert.text.real_delete}]];
+            break;
+        default:
+            break;
+    }
+
+    return message;
+}
+/*]]>*/
+</script>
+<script type="text/javascript" src="/js/include/menu_authority.js"></script>
+<script type="text/javascript" src="/js/authority/auth1.js"></script>
+</th:block>
+</body>
+</html>

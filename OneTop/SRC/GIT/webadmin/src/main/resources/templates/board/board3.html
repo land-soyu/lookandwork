@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+<title th:text="#{board3.title}"></title>
+<th:block layout:fragment="css">
+<link rel="stylesheet" href="/css/datepicker.min.css"/>
+</th:block>
+</head>
+<body>
+<!-- leftMenu -->
+<div layout:fragment="menu">
+    <div th:replace="include/menu :: board"></div>
+</div>
+<!-- //leftMenu -->
+<div layout:fragment="content">
+    <th:block th:if="${securityYN}=='N'">권한이 없습니다.</th:block>
+    <div class="contSection" th:if="${securityYN}=='Y'">
+        <h2 class="tit_h2" th:text="#{board3.h2}"></h2>
+        <form action="board3" method="post" name="search_qna_form" id="search_qna_form">
+            <input type="hidden" name="page" id="page" th:value="${page}" />
+            <div class="tableStyle2 boardStyle mb20 icsel">
+                <table>
+                    <colgroup>
+                        <col style="width: 17%;" />
+                        <col style="width: 33%;" />
+                        <col style="width: 17%;" />
+                        <col style="width: 33%;" />
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th th:text="#{board3.table.th.state} + ' *'"></th>
+                        <td>
+                            <span class="typeSelect">
+                                <select name="search_state" id="search_state">
+                                    <option value="all" th:selected="${search_state == 'all'}" th:text="#{all}"></option>
+                                    <option value="N" th:selected="${search_state == 'N'}" th:text="#{board3.table.td.state.n}"></option>
+                                    <option value="Y" th:selected="${search_state == 'Y'}" th:text="#{board3.table.td.state.y}"></option>
+                                </select>
+                            </span>
+                        </td>
+                        <th th:text="#{board3.table.th.qna_first_type} + ' ' + #{registration.date} + ' *'"></th>
+                        <td>
+                            <p class="dateChoice">
+                                 <span>
+                                    <img src="/images/calendar_icon.png"/>
+                                    <input id="search_reg_dt" name="search_reg_dt" type="text" class="datepicker-here"
+                                           data-range="true"
+                                           data-multiple-dates-separator=" - "
+                                           th:data-language="${#locale}"
+                                           placeholder="YYYY.MM.DD - YYYY.MM.DD"
+                                           th:value="${search_reg_dt != null} ? ${search_reg_dt} : ''"
+                                    />
+                                </span>
+                            </p>
+                            <a href="javascript: setDateChoiceChange(1);"  class="dateSelectBtn" th:text="#{date.select.btn.1}"></a>
+                            <a href="javascript: setDateChoiceChange(2);"  class="dateSelectBtn" th:text="#{date.select.btn.2}"></a>
+                            <a href="javascript: setDateChoiceChange(3);"  class="dateSelectBtn" th:text="#{date.select.btn.3}"></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th th:text="#{board3.table.th.id}"></th>
+                        <td>
+                            <span class="typeText"><input type="text" name="search_id" id="search_id" th:value="${search_id}" th:placeholder="#{enter.id}" /></span>
+                        </td>                        
+                        <th th:text="#{search.content}"></th>
+                        <td><span class="typeText"><input type="text" name="search_content" id="search_content" th:value="${search_content}" th:placeholder="#{input.search.content}" /></span></td>
+                    </tr>                    
+                    </tbody>
+                </table>
+            </div>
+            <div class="buttonRight mb50">
+                <a href="javascript:;" class="btnType" id="search_qna_btn" th:text="#{search.btn}"></a>
+            </div>
+            <div class="listCountWrap">
+                <h3 class="tit_h3" th:if="${#locale.toString()} == 'ko'" th:text="#{cnt.search} + ' ' + ${qnaResponse.total_qna_count}  + #{cnt}"></h3>
+                <h3 class="tit_h3" th:if="${#locale.toString()} == 'en'" th:text="${qnaResponse.total_qna_count} + ' ' + #{cnt.search}"></h3>
+                <span class="typeSelect">
+                    <select name="search_listCount" id="searchListCount">
+                        <option value="10" th:selected="${search_listCount == 10}">10</option>
+                        <option value="20" th:selected="${search_listCount == 20}">20</option>
+                        <option value="50" th:selected="${search_listCount == 50}">50</option>
+                        <option value="100" th:selected="${search_listCount == 100}">100</option>
+                    </select>
+                </span>
+            </div>
+        </form>
+        <div class="tableStyle boardStyle aCenter mb20">
+            <table>
+                <colgroup>
+                </colgroup>
+                <thead>
+                <tr>
+                    <th th:text="#{board3.table.th.no}"></th>                                        
+                    <th th:text="#{board3.table.th.id}"></th>
+                    <th th:text="#{title}"></th>                                        
+                    <th th:text="#{registration.date}"></th>
+                    <th th:text="#{board3.table.th.state}"></th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="qna : ${qnaResponse.qnaList}" th:class="${qna.state == 'N' ? 'bgOrange' : ''}">
+                        <td th:text="${qna.no}"></td>                        
+                        <td th:if="${member_proc.role != 2}"><a th:href="'javascript:show_member_detail(\'' + ${qna.member_id} + '\')'" th:text="${qna.member_id}"></a></td>
+                        <td th:unless="${member_proc.role != 2}"><span th:text="${qna.member_id}"></span></td>                        
+                        <td><a th:href="@{'board3_mod?no=' + ${qna.no}}" th:text="${qna.title}"></a></td>                                                
+                        <td th:text="${#dates.format(qna.reg_dt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                        <td>
+                            <a th:href="@{'board3_mod?no=' + ${qna.no}}" th:if="${qna.state == 'N'}" th:text="#{board3.table.td.state.n}"></a>
+                            <a th:href="@{'board3_mod?no=' + ${qna.no}}" th:if="${qna.state == 'Y'}" th:text="#{board3.table.td.state.y}"></a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="pageFoot inPaging">
+            <div class="paging">
+                <a href="javascript: goPage('1', '#search_qna_form');" class="prevBt"></a>
+                <a th:if="${qnaResponse.pageNaviResponse.isPrev == 1}" href="javascript: goPrePage('#search_qna_form');" class="beforeBt"></a>
+                <a th:if="${qnaResponse.pageNaviResponse.isPrev != 1}" href="javascript:;" class="beforeBt"></a>
+                <ul th:each="index: ${#numbers.sequence(qnaResponse.pageNaviResponse.decadeFirst, qnaResponse.pageNaviResponse.decadeLast)}">
+                    <li th:class="${qnaResponse.pageNaviResponse.current_page == index ? 'on' : ''}"><a th:href="@{'javascript: goPage(' + ${index} + ', \'#search_qna_form\');'}" th:text="${index}"></a></li>
+                </ul>
+                <a th:if="${qnaResponse.pageNaviResponse.isNext == 1}" href="javascript: goNextPage('#search_qna_form');" class="afterBt"></a>
+                <a th:if="${qnaResponse.pageNaviResponse.isNext != 1}" href="javascript:;" class="afterBt"></a>
+                <a th:href="@{'javascript: goPage(' + ${qnaResponse.pageNaviResponse.lastPage} + ', \'#search_qna_form\');'}" href="javascript: goPage();" class="nextBt"></a>
+            </div>
+        </div>
+    </div>
+    <!-- //contSection -->
+</div>
+<!-- //contents -->
+<th:block layout:fragment="side">
+    <!-- 답변상태 히스토리 보기 --> <!--TODO 팝업-->
+    <div class="popupArea" id="statusHistoryListPopup" style="display: none;">
+        <div class="dim"></div>
+        <div class="popupLayer">
+            <div class="popup">
+                <div class="box pop530">
+                    <p class="popTit" th:text="#{board3.state.history}"></p>
+                    <div class="popCont">
+                        <div class="statusHistoryListTable">
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th th:text="#{board3.answer}"></th>
+                                    <th th:text="#{board3.mod.state.reg_dt}"></th>
+                                </tr>
+                                </thead>
+                                <tbody id="statusHistory"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <p class="popButton">
+                        <a href="javascript:void(0);" class="popCancel">닫기</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+<th:block layout:fragment="script">
+<script type="text/javascript" src="/js/datepicker.min.js"></script>
+<script type="text/javascript" src="/js/i18n/datepicker.ko.js"></script>
+    <script type="text/javascript" src="/js/i18n/datepicker.en.js"></script>
+<script type="text/javascript" src="/js/include/menu_board.js"></script>
+<script type="text/javascript" src="/js/board/board3.js"></script>
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+    var DATEPICKER_ALERT_1 = [[#{datepicker.alert.1}]];
+    var lang = [[${#locale}]];
+    console.log(lang);
+    /*]]>*/
+</script>
+</th:block>
+</body>
+</html>
